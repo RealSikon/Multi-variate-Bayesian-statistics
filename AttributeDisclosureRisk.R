@@ -25,7 +25,8 @@ syn_normal_brms = function(orig_data, syn_data,
   ff = as.formula(model_brms)
   utils::str(model <- model.frame(ff, syn_data))
   X = model.matrix(ff, model)
-
+  
+  print("Fitting stan_glm")
   fit = stan_glm(
     model_brms,
     data = orig_data,
@@ -34,7 +35,8 @@ syn_normal_brms = function(orig_data, syn_data,
     refresh = 0,
     chains = chains, iter = iterations
   )
-
+  
+  print("Synthesising")
   #### Synthesis ####
   N = length(orig_data[,1])
   draws = as.data.frame(fit)
@@ -71,6 +73,8 @@ CEdata_syn_cont = list(CEdata_syn_cont)
 #H: The number of posterior parameter draws in the importance sampling step.
 #H <- 50
 
+print("Measuring AttributeDisclosureRisk")
+
 #Synthesis of Race given LogIncomee,the confidential dataset
 #(CEdata), the synthetic dataset (CEdata_syn_cat), and MCMC draws (draws_cat).
 #We use c("multinom") for the synthesizer type for categorical Race and the default value of H (H = 50).
@@ -83,5 +87,6 @@ Two_Cont = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ 1),
                          G = c(11, 11),
                          H = 50)
 
-
+print("Making plots")
+randomGuessPlot(Two_Cont)
 
