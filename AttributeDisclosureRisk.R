@@ -2,23 +2,23 @@
 #as provided by https://arxiv.org/pdf/2103.09805.pdf
 
 #Installation of standard packages:
-#install.packages(c("rstanarm", "brms", "synthpop"))
-
-#Installation of packages provided by Ryan Hornby:
-#install_github("RyanHornby/AttributeRiskCalculation")
-#devtools::install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
-
-#require(IdentificationRiskCalculation)
-#require(synthpop)
+#install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress"))
+require(synthpop)
 library(devtools)
 require(rstanarm)
 require(brms)
+
+
+#Installation of packages provided by Ryan Hornby:
+install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
+require(IdentificationRiskCalculation)
+install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
 #Using Synthpop to make a fully synthetic dataset of CEdata
 #syn_data <- syn(CEdata, m = 20)
 
-#Synthesizing continuous Expenditure and Income sequentially with the stan_glm() function
+#Synthesizing continuous LogExpenditure and LogIncome sequentially with the stan_glm() function
 syn_normal_brms = function(orig_data, syn_data,
                            model_brms = brmsformula(outcome ~ 1),
                            chains = 1, iterations = 1000, m = 20, thin = 5) {
@@ -53,11 +53,11 @@ syn_normal_brms = function(orig_data, syn_data,
 CEdata_syn_cont = CEdata
 draws_cont = list()
 synthesis_cont = syn_normal_brms(CEdata, CEdata_syn_cont,
-                                 bf(Expenditure ~ 1), m = 1)
-CEdata_syn_cont$Expenditure = synthesis_cont[[1]][[1]]
+                                 bf(LogExpenditure ~ 1), m = 1)
+CEdata_syn_cont$LogExpenditure = synthesis_cont[[1]][[1]]
 synthesis_cont2 = syn_normal_brms(CEdata, CEdata_syn_cont,
-                                  bf(Income ~ Expenditure), m = 1)
-CEdata_syn_cont$Income = synthesis_cont2[[1]][[1]]
+                                  bf(LogIncome ~ LogExpenditure), m = 1)
+CEdata_syn_cont$LogIncome = synthesis_cont2[[1]][[1]]
 draws_cont[[1]] = synthesis_cont[[2]]
 draws_cont[[2]] = synthesis_cont2[[2]]
 CEdata_syn_cont = list(CEdata_syn_cont)
@@ -71,11 +71,11 @@ CEdata_syn_cont = list(CEdata_syn_cont)
 #H: The number of posterior parameter draws in the importance sampling step.
 #H <- 50
 
-#Synthesis of Race given Incomee,the confidential dataset
+#Synthesis of Race given LogIncomee,the confidential dataset
 #(CEdata), the synthetic dataset (CEdata_syn_cat), and MCMC draws (draws_cat).
 #We use c("multinom") for the synthesizer type for categorical Race and the default value of H (H = 50).
-Two_Cont = AttributeRisk(modelFormulas = list(bf(Expenditure ~ 1),
-                                              bf(Income ~ Expenditure)),
+Two_Cont = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ 1),
+                                              bf(LogIncome ~ LogExpenditure)),
                          origdata = CEdata,
                          syndata = CEdata_syn_cont,
                          posteriorMCMCs = draws_cont,
