@@ -7,7 +7,7 @@ require(synthpop)
 library(devtools)
 require(rstanarm)
 require(brms)
-
+source("PlotFunctions.R")
 
 #Installation of packages provided by Ryan Hornby:
 install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
@@ -88,6 +88,26 @@ Two_Cont = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ 1),
                          G = c(11, 11),
                          H = 50)
 
+#' Produces a graph of the probabilities of each guess with a line indicating 
+#' the chance of randomly guessing the confidential value(s) from among the 
+#' guesses.
+#' 
+#' Density of the joint posterior probability of correctly guessing the true
+#' value of both LogIncome and LogExpenditure. The vertical line shows the prior probability of 1/121.
 print("Making plots")
 randomGuessPlot(Two_Cont)
+
+#' The rank of posterior probability of the true pair of values 
+#' (of LogIncome and LogExpenditure being guessed correctly, among 121 (11*11) guesses)
+posteriorRankPlot(Two_Cont)
+
+#' Density of the marginal posterior probabilities of correctly guessing the
+#' true value (of LogIncome and LogExpenditure, respectively). The vertical line shows
+#' the prior probability (of 1/11).
+marginalPosteriorProbabilitiesPlot(Two_Cont)
+
+#' Density of the absolute difference between the true value and the
+#' guessed value with the largest marginal
+#' posterior probability (for both LogIncome and LogExpenditure).
+absoluteDifferencePlot(Two_Cont)
 
