@@ -52,12 +52,13 @@ syn_normal_brms = function(orig_data, syn_data,
   return(list(syndata, draws))
 }
 
-CEdata_syn_cont = CEdata
+CEData_cut <- CEdata[1:200, ]
+CEdata_syn_cont = CEData_cut
 draws_cont = list()
-synthesis_cont = syn_normal_brms(CEdata, CEdata_syn_cont,
+synthesis_cont = syn_normal_brms(CEData_cut, CEdata_syn_cont,
                                  bf(LogExpenditure ~ 1), m = 1)
 CEdata_syn_cont$LogExpenditure = synthesis_cont[[1]][[1]]
-synthesis_cont2 = syn_normal_brms(CEdata, CEdata_syn_cont,
+synthesis_cont2 = syn_normal_brms(CEData_cut, CEdata_syn_cont,
                                   bf(LogIncome ~ LogExpenditure), m = 1)
 CEdata_syn_cont$LogIncome = synthesis_cont2[[1]][[1]]
 draws_cont[[1]] = synthesis_cont[[2]]
@@ -80,7 +81,7 @@ print("Measuring AttributeDisclosureRisk")
 #We use c("multinom") for the synthesizer type for categorical Race and the default value of H (H = 50).
 Two_Cont = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ 1),
                                               bf(LogIncome ~ LogExpenditure)),
-                         origdata = CEdata,
+                         origdata = CEData_cut,
                          syndata = CEdata_syn_cont,
                          posteriorMCMCs = draws_cont,
                          syntype = c("norm", "norm"),
