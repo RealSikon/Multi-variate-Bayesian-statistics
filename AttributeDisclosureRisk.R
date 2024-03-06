@@ -19,50 +19,77 @@ require(AttributeRiskCalculation)
 #syn_data <- syn(CEdata, m = 20)
 
 #Synthesizing continuous LogExpenditure and LogIncome sequentially with the stan_glm() function
-syn_normal_brms = function(orig_data, syn_data,
-                           model_brms = brmsformula(outcome ~ 1),
-                           chains = 1, iterations = 1000, m = 20, thin = 5) {
+syn_normal_brms = function(orig_data,         #Real dataset
+                           syn_data,          #Synthetic dataset
+                           model_brms,        #Formula to be used for synthesis
+                           chains = 1,        #Number of chains to be used in regression model
+                           iterations = 1000, #Iterations used to fit regression model
+                           m = 20,            #Number of iterations over samples
+                           thin = 5           #the thinning interval (i.e., the number of iterations to skip between samples)
+                           ) 
+  {
+  
   ff = as.formula(model_brms)
-  utils::str(model <- model.frame(ff, syn_data))
-  X = model.matrix(ff, model)
+  
+  #Provide a summary of model
+  utils::str(model <- model.frame(ff, syn_data)  #model: a data frame of variables specified in the formula, using columns of syn_data that match the variable names in the formula.
+             ) 
+  X = model.matrix(ff, model)                    #X: a matrix of the predictor variables used in the model
   
   print("Fitting stan_glm")
+  
+  #Fit a generalized linear model on real data
   fit = stan_glm(
-    model_brms,
-    data = orig_data,
-    family = gaussian(),
-    prior = normal(0, 2, autoscale = FALSE),
-    refresh = 0,
-    chains = chains, iter = iterations
+    model_brms,                              #formula used for synthesis
+    data = orig_data,                        
+    family = gaussian(),                     #function to be used in fitting the generalized linear model
+    prior = normal(0, 2, autoscale = FALSE), #prior: a normal distribution with mean = 0, deviation = 2
+    refresh = 0,                             #how often to print updates when sampling
+    chains = chains,                         #Number of MCMC chains to estimate the posterior distribution
+    iter = iterations                        #Number of samples per chain
   )
   
-  print("Synthesising")
+  
   #### Synthesis ####
-  N = length(orig_data[,1])
-  draws = as.data.frame(fit)
-  start = length(draws[,1]) - thin * (m - 1)
-  syndata = vector("list", m)
+  print("Synthesising")
+  
+  N = length(orig_data[,1])                  #N: Length of first column in the real dataset (number of observations)
+  draws = as.data.frame(fit)                 #extract the intercept (expected value of the response variable when all predictor variables are equal to zero) and sigma (represents the variability of the response variable) samples from the posterior distribution obtained during the MCMC sampling process
+  start = length(draws[,1]) - thin * (m - 1) #declare start index 
+  syndata = vector("list", m)                #instantiate vector to contain synthetic data
+  
   for (i in 1:m){
-    indx = start + thin * (i - 1)
-    draws_exp_mean = as.matrix(X) %*%
-      t(draws[indx, !names(draws) %in% c("sigma")])
-    draws_sd = draws[indx, "sigma"]
-    syndata[[i]] = rnorm(N, mean = draws_exp_mean, sd = draws_sd)
+    indx = start + thin * (i - 1)                                 #Skip iterations
+    draws_exp_mean = as.matrix(X) %*%                             #find expected mean of the synthetic data based on the posterior samples of the model parameters.
+      t(draws[indx, !names(draws) %in% c("sigma")])                  #multiply the matrix of predictor variables (X) by the transpose of the selected posterior samples, excluding the "sigma" parameter.
+    draws_sd = draws[indx, "sigma"]                               #draws_sd: the standard deviation of the synthetic data
+    syndata[[i]] = rnorm(N, mean = draws_exp_mean, sd = draws_sd) #generate synthetic data each iteration with the previously calculated mean and std. deviation
   }
   return(list(syndata, draws))
 }
 
-CEData_cut <- CEdata[1:200, ]
+#Assign data variables
+CEData_cut <- CEdata[1:200, ] 
 CEdata_syn_cont = CEData_cut
 draws_cont = list()
-synthesis_cont = syn_normal_brms(CEData_cut, CEdata_syn_cont,
-                                 bf(LogExpenditure ~ 1), m = 1)
+
+synthesis_cont = syn_normal_brms(CEData_cut, 
+                                 CEdata_syn_cont,
+                                 bf(LogExpenditure ~ 1),
+                                 m = 1
+                                 )
 CEdata_syn_cont$LogExpenditure = synthesis_cont[[1]][[1]]
-synthesis_cont2 = syn_normal_brms(CEData_cut, CEdata_syn_cont,
-                                  bf(LogIncome ~ LogExpenditure), m = 1)
+
+synthesis_cont2 = syn_normal_brms(CEData_cut, 
+                                  CEdata_syn_cont,
+                                  bf(LogIncome ~ LogExpenditure), 
+                                  m = 1
+                                  )
 CEdata_syn_cont$LogIncome = synthesis_cont2[[1]][[1]]
+
 draws_cont[[1]] = synthesis_cont[[2]]
 draws_cont[[2]] = synthesis_cont2[[2]]
+
 CEdata_syn_cont = list(CEdata_syn_cont)
 
 
@@ -86,7 +113,8 @@ Two_Cont = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ 1),
                          posteriorMCMCs = draws_cont,
                          syntype = c("norm", "norm"),
                          G = c(11, 11),
-                         H = 50)
+                         H = 50
+                         )
 
 #' Produces a graph of the probabilities of each guess with a line indicating 
 #' the chance of randomly guessing the confidential value(s) from among the 
