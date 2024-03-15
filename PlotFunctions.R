@@ -1,3 +1,6 @@
+###Functions for plotting results###
+
+
 #' Make a plot of the rank of posterior probability of the true pair of values 
 #' (of LogIncome and LogExpenditure being guessed correctly, among 121 (11*11) guesses)
 posteriorRankPlot <- function(risks){
@@ -5,15 +8,18 @@ posteriorRankPlot <- function(risks){
   for (i in 1:length(risks)) {
     true_ranks[i] = risks[[i]]$RankTrue
   }
-  
+
   plotdf = as.data.frame(true_ranks)
   
   plt = ggplot(data = plotdf) + geom_histogram(aes(abs(true_ranks))) + 
-    labs(x = "Rank of true value", y = "Count")
+    labs(x = "Rank of true value", y = "Count") +
+    ggtitle("posteriorRankPlot")
   
   plt
   return(plt)
 }
+
+
 
 #' Density of the marginal posterior probabilities of correctly guessing the
 #' true value (of LogIncome and LogExpenditure, respectively). The vertical line shows
@@ -33,8 +39,9 @@ marginalPosteriorProbabilitiesPlot = function(risks) {
     geom_density(aes(abs(true_marginals$second), color = "LogIncome"), size = 1) + 
     theme(panel.background = element_rect(fill = "white", color = "black"),
           panel.grid.major = element_line(color = "grey")) + 
-    labs(x = "Probability of guessing correctly", y = "Density")
-  
+    labs(x = "Probability of guessing correctly", y = "Density") +
+    ggtitle("marginalPosteriorProbabilitiesPlot")
+
   plt = plt + geom_vline(aes(xintercept = 1/length(risks[[1]]$FullProb[, 1])), col = "red", size = 1)
   
   plt
@@ -59,7 +66,8 @@ absoluteDifferencePlot = function(risks) {
     geom_density(aes(abs(marginal_diff$second), color = "LogIncome"), size = 1) + 
     theme(panel.background = element_rect(fill = "white", color = "black"),
           panel.grid.major = element_line(color = "grey")) + 
-    labs(x = "Absolute difference", y = "Density")
+    labs(x = "Absolute difference", y = "Density") +
+    ggtitle("absoluteDifferencePlot")
   
   plt
   return(plt)
