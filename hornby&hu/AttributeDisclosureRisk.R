@@ -68,13 +68,13 @@ for (i in 1:length(privbayesModel[[3]])){
 #Root node LogIncome
 
 #Synthesise based on the formulars
-#formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
-#eval(parse(text = formula_str))
-#for (i in 2:(length(formulars))){
-#  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i-1]], ", m = 1)", sep="")
+formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
+eval(parse(text = formula_str))
+for (i in 2:(length(formulars))){
+  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i-1]], ", m = 1)", sep="")
   #eval(parse(text = formula_str))
-#  print(parse(text = formula_str))
-#}
+  print(parse(text = formula_str))
+}
 
 synthesis_LogIncome = syn_normal_brms(CEData_cut, 
                                            CEdata_syn_cut,
