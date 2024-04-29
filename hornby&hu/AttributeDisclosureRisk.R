@@ -27,9 +27,10 @@ data_directory    <- file.path(parent_directory, "data")
 #Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
 
-file <- file.path(data_directory, "synthetic_data.csv")
+file <- file.path(data_directory, "synthetic_data_origin.csv")
 CEdata_syn = read.csv(file)
-
+#Using synthesised data made using PrivBayes on CEData, where TotalIncomeLastYear and TotalExpLastQ has been removed.
+CEData_cut = subset(CEdata[1:200, ], select = -c(TotalIncomeLastYear, TotalExpLastQ))
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
@@ -66,46 +67,47 @@ for (i in 1:length(privbayesModel[[3]])){
 #Root node LogIncome
 
 #Synthesise based on the formulars
-formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
-eval(parse(text = formula_str))
-for (i in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i-1]], ", m = 1)", sep="")
-  eval(parse(text = formula_str))
-}
+#formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
+#eval(parse(text = formula_str))
+#for (i in 2:(length(formulars))){
+#  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i-1]], ", m = 1)", sep="")
+  #eval(parse(text = formula_str))
+#  print(parse(text = formula_str))
+#}
 
-#synthesis_LogIncome = syn_normal_brms(CEData_cut, 
-#                                           CEdata_syn_cut,
-#                                           bf(LogIncome ~ 1),
-#                                           m = 1
-#)
+synthesis_LogIncome = syn_normal_brms(CEData_cut, 
+                                           CEdata_syn_cut,
+                                           bf(LogIncome ~ 1),
+                                           m = 1
+)
 
-# LogExpenditure has parents ['LogIncome'].
-#synthesis_LogExpenditure = syn_normal_brms(CEData_cut, 
-#                                           CEdata_syn_cut,
-#                                           bf(LogExpenditure ~ LogIncome),
-#                                           m = 1
-#)
+#LogExpenditure has parents ['LogIncome'].
+synthesis_LogExpenditure = syn_normal_brms(CEData_cut, 
+                                           CEdata_syn_cut,
+                                           bf(LogExpenditure ~ LogIncome),
+                                           m = 1
+)
 
-# KidsCount      has parents ['LogExpenditure', 'LogIncome'].
-#synthesis_KidsCount = syn_normal_brms(CEData_cut, 
-#                                           CEdata_syn_cut,
-#                                           bf(KidsCount ~ LogExpenditure + LogIncome),
-#                                           m = 1
-#)
+#KidsCount      has parents ['LogExpenditure', 'LogIncome'].
+synthesis_KidsCount = syn_normal_brms(CEData_cut, 
+                                           CEdata_syn_cut,
+                                           bf(KidsCount ~ LogExpenditure + LogIncome),
+                                           m = 1
+)
 
-# Race           has parents ['LogExpenditure', 'LogIncome'].
-#synthesis_Race = syn_normal_brms(CEData_cut, 
-#                                      CEdata_syn_cut,
-#                                      bf(Race ~ LogExpenditure + LogIncome),
-#                                      m = 1
-#)
+#Race           has parents ['LogExpenditure', 'LogIncome'].
+synthesis_Race = syn_normal_brms(CEData_cut, 
+                                      CEdata_syn_cut,
+                                      bf(Race ~ LogExpenditure + LogIncome),
+                                      m = 1
+)
 
-# UrbanRural     has parents ['Race', 'LogIncome'].
-#synthesis_UrbanRural = syn_normal_brms(CEData_cut, 
-#                                 CEdata_syn_cut,
-#                                 bf(UrbanRural ~ Race + LogIncome),
-#                                 m = 1
-#)
+#UrbanRural     has parents ['Race', 'LogIncome'].
+synthesis_UrbanRural = syn_normal_brms(CEData_cut, 
+                                 CEdata_syn_cut,
+                                 bf(UrbanRural ~ Race + LogIncome),
+                                 m = 1
+)
 
 CEdata_syn_cut = list(CEdata_syn_cut)
 
