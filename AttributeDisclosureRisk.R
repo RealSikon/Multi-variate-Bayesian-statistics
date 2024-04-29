@@ -2,12 +2,14 @@
 #as provided by https://arxiv.org/pdf/2103.09805.pdf
 
 #Installation of standard packages:
-#install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress"))
-require(synthpop)
+#Install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress"))
+library(synthpop)
 library(devtools)
-require(rstanarm)
-require(brms)
-require(ggplot2)
+library(rstanarm)
+library(brms)
+library(ggplot2)
+library(jsonlite)
+#Auxiliary functions
 source("PlotFunctions.R")
 source("ModelFitting.R")
 
@@ -17,13 +19,20 @@ require(IdentificationRiskCalculation)
 install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
-#Using synthesised data made using PrivBayes on CEData, where TotalIncomeLastYear and TotalExpLastQ has been removed.
-CEData_cut = subset(CEdata[1:200, ], select = -c(TotalIncomeLastYear, TotalExpLastQ))
+#Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
 file <- "synthetic_data.csv"
 CEdata_syn = read.csv(file)
+
+#Using synthesised data made using PrivBayes on CEData, where TotalIncomeLastYear and TotalExpLastQ has been removed.
+CEData_cut = subset(CEdata[1:200, ], select = -c(TotalIncomeLastYear, TotalExpLastQ))
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
+
+# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
+privbayesModel <- fromJSON("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\DataSynthesizer\\notebooks\\out\\correlated_attribute_mode\\description.json")
+
+
 draws_cont = list()
 draws_cont1 = list()
 draws_cont2 = list()
