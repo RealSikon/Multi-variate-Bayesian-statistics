@@ -19,16 +19,22 @@ require(IdentificationRiskCalculation)
 install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
+#Set current directory
+current_directory <- getwd()
+parent_directory  <- dirname(current_directory)
+data_directory    <- file.path(parent_directory, "data")
+
 #Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
-file <- "synthetic_data.csv"
+
+file <- file.path(data_directory, "synthetic_data.csv")
 CEdata_syn = read.csv(file)
 
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
 # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
-privbayesModel <- fromJSON("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\DataSynthesizer\\notebooks\\out\\correlated_attribute_mode\\description.json")
+privbayesModel <- fromJSON(file.path(data_directory, "description.json"))
 
 
 draws_cont = list()
