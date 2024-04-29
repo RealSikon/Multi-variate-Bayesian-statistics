@@ -23,6 +23,7 @@ require(AttributeRiskCalculation)
 current_directory <- getwd()
 parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
+plot_directory    <- file.path(parent_directory, "plots")
 
 #Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
@@ -212,7 +213,7 @@ x <- length(risk_list)
 #' value of both LogIncome and LogExpenditure. The vertical line shows the prior probability of 1/121.
 for (j in 1:x){
   plotName <- paste("randomguessPlot", j, ".png", sep = "")
-  ggsave(plotName, device = "png", randomGuessPlot(risk_list[[j]]), path = "plots")
+  ggsave(plotName, device = "png", randomGuessPlot(risk_list[[j]]), path = plot_directory)
 }
  
 
@@ -221,7 +222,7 @@ for (j in 1:x){
 #' (of LogIncome and LogExpenditure being guessed correctly, among 121 (11*11) guesses)
 for (j in 1:x){
   plotName <- paste("posteriorRankPlot", j, ".png", sep = "")
-  ggsave(plotName, device = "png", posteriorRankPlot(risk_list[[j]]), path = "plots")
+  ggsave(plotName, device = "png", posteriorRankPlot(risk_list[[j]]), path = plot_directory)
 }
 
 #Print first two plots for all formulas
@@ -234,11 +235,11 @@ for (j in 1:x){
 #' NEEDS TWO FORMLUAS
 
 plotName <- paste("marginalPosteriorProbabilitiesPlot1.png")
-ggsave(plotName, device = "png", marginalPosteriorProbabilitiesPlot(risk_list[[1]]), path = "plots")
+ggsave(plotName, device = "png", marginalPosteriorProbabilitiesPlot(risk_list[[1]]), path = plot_directory)
 # absoluteDifferencePlot
 #' Density of the absolute difference between the true value and the
 #' guessed value with the largest marginal
 #' posterior probability (for both LogIncome and LogExpenditure).
 #' NEEDS TWO FORMLUAS
 plotName <- paste("absoluteDifferencePlot1.png")
-ggsave(plotName, device = "png", absoluteDifferencePlot(risk_list[[1]]), path = "plots")
+ggsave(plotName, device = "png", absoluteDifferencePlot(risk_list[[1]]), path = plot_directory)
