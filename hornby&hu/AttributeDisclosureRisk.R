@@ -30,8 +30,8 @@ plot_directory    <- file.path(parent_directory, "plots")
 
 file <- file.path(data_directory, "synthetic_data_origin.csv")
 CEdata_syn = read.csv(file)
-#Using synthesised data made using PrivBayes on CEData, where TotalIncomeLastYear and TotalExpLastQ has been removed.
-CEData_cut = subset(CEdata[1:200, ], select = -c(TotalIncomeLastYear, TotalExpLastQ))
+#Using synthesised data made using PrivBayes on CEData
+CEData_cut = subset(CEdata[1:200, ], )
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
