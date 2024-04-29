@@ -24,8 +24,6 @@ require(AttributeRiskCalculation)
 file <- "synthetic_data.csv"
 CEdata_syn = read.csv(file)
 
-#Using synthesised data made using PrivBayes on CEData, where TotalIncomeLastYear and TotalExpLastQ has been removed.
-CEData_cut = subset(CEdata[1:200, ], select = -c(TotalIncomeLastYear, TotalExpLastQ))
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
@@ -38,6 +36,20 @@ draws_cont1 = list()
 draws_cont2 = list()
 draws_cont3 = list()
 draws_cont4 = list()
+
+#List of formulars
+formulars = list()
+# Add the root conditionals(node + parent) to the list formulars (0 parents)
+formulars[[1]] = paste("bf(", privbayesModel[[3]][[1]][[2]], " ~ 1)", sep="")
+
+# Add other conditionals TODO: add support for k number of children
+for (i in 1:length(privbayesModel[[3]])){
+  formulars[[i+1]] = paste("bf(", privbayesModel[[3]][[i]][[1]], " ~ ", privbayesModel[[3]][[i]][[2]][[1]], sep="")
+  if (length(privbayesModel[[3]][[i]][[2]]) > 1){
+    formulars[[i+1]] = paste(formulars[[i+1]], " + ", privbayesModel[[3]][[i]][[2]][[2]], sep="")
+  }
+  formulars[[i+1]] = paste(formulars[[i+1]], ")", sep="")
+}
 
 # Models from ModelFitting.R that can be used for synthesising and/or fitting:
 #   syn_normal_brms()      : Fits a stan_glm to the data ("norm" distribution) 
