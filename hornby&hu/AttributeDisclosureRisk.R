@@ -70,38 +70,39 @@ for (i in 1:length(privbayesModel[[3]])){
 #Synthesise based on the formulars
 formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
 eval(parse(text = formula_str))
+print(parse(text = formula_str))
 for (i in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i-1]], ", m = 1)", sep="")
-  #eval(parse(text = formula_str))
+  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i]], ", m = 1)", sep="")
+  eval(parse(text = formula_str))
   print(parse(text = formula_str))
 }
 
-synthesis_LogIncome = syn_normal_brms(CEData_cut, 
-                                           CEdata_syn_cut,
-                                           bf(LogIncome ~ 1),
-                                           m = 1
-)
+#synthesis_LogIncome = syn_normal_brms(CEData_cut, 
+#                                           CEdata_syn_cut,
+#                                           bf(LogIncome ~ 1),
+#                                           m = 1
+#)
 
 #LogExpenditure has parents ['LogIncome'].
-synthesis_LogExpenditure = syn_normal_brms(CEData_cut, 
-                                           CEdata_syn_cut,
-                                           bf(LogExpenditure ~ LogIncome),
-                                           m = 1
-)
+#synthesis_LogExpenditure = syn_normal_brms(CEData_cut, 
+#                                           CEdata_syn_cut,
+#                                           bf(LogExpenditure ~ LogIncome),
+#                                           m = 1
+#)
 
 #KidsCount      has parents ['LogExpenditure', 'LogIncome'].
-synthesis_KidsCount = syn_normal_brms(CEData_cut, 
-                                           CEdata_syn_cut,
-                                           bf(KidsCount ~ LogExpenditure + LogIncome),
-                                           m = 1
-)
+#synthesis_KidsCount = syn_normal_brms(CEData_cut, 
+#                                           CEdata_syn_cut,
+#                                           bf(KidsCount ~ LogExpenditure + LogIncome),
+#                                           m = 1
+#)
 
 #Race           has parents ['LogExpenditure', 'LogIncome'].
-synthesis_Race = syn_normal_brms(CEData_cut, 
-                                      CEdata_syn_cut,
-                                      bf(Race ~ LogExpenditure + LogIncome),
-                                      m = 1
-)
+#synthesis_Race = syn_normal_brms(CEData_cut, 
+#                                      CEdata_syn_cut,
+#                                      bf(Race ~ LogExpenditure + LogIncome),
+#                                      m = 1
+#)
 
 #UrbanRural     has parents ['Race', 'LogIncome'].
 synthesis_UrbanRural = syn_normal_brms(CEData_cut, 
@@ -129,7 +130,6 @@ draws_cont1[[1]] = synthesis_LogExpenditure[[2]]
 draws_cont2[[1]] = synthesis_KidsCount[[2]]
 draws_cont3[[1]] = synthesis_Race[[2]]
 draws_cont4[[1]] = synthesis_UrbanRural[[2]]
-
 #This does not work:
 # Two_Cont = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
 #                                               bf(LogExpenditure ~ LogIncome),
@@ -145,9 +145,8 @@ draws_cont4[[1]] = synthesis_UrbanRural[[2]]
 #                         H = 1
 #                         # categorical = c(0, 0, 1, 1, 0)
 #                         )
-
-
 #Estimate attribute disclosure risk of LogIncome and LogExpenditure
+#Something is going wrong here
 risk1 = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
                                               bf(LogExpenditure ~ LogIncome)
                                               ),
