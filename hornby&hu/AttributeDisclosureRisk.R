@@ -25,20 +25,8 @@ parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
 plot_directory    <- file.path(parent_directory, "plots")
 
-
-# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
-privbayesModel           <- fromJSON(file.path(data_directory, "description.json"))
-meta                     <- privbayesModel[[1]] #[#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
-attributeDescription     <- privbayesModel[[2]]
-bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent1], [parent2], ... [parentk]]]
-conditionalProbabilities <- privbayesModel[[4]]
-
-
 #Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
-realData      <- read.csv(file.path(data_directory, "synthetic_data_origin.csv"))[1:meta[[1]], ]
-syntheticData <- read.csv(file.path(data_directory, "synthetic_data.csv"))
-
 file <- file.path(data_directory, "synthetic_data_origin.csv")
 CEdata_syn = read.csv(file)
 #Using synthesised data made using PrivBayes on CEData
@@ -46,11 +34,19 @@ CEData_cut = subset(CEdata[1:200, ], )
 #Take only first 200 rows
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
+# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
+privbayesModel           <- fromJSON(file.path(data_directory, "description.json"))
+meta                     <- privbayesModel[[1]]
+attributeDescription     <- privbayesModel[[2]]
+bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent1], [parent2], .. [parentk]]]
+conditionalProbabilities <- privbayesModel[[4]]
+
 
 #List of formulars
 formulars = list()
 # Add the root conditionals(node + parent) to the list formulars (0 parents)
 formulars[[1]] = paste("bf(", bayesianNetwork[[1]][[2]], " ~ 1)", sep="")
+
 # Add other conditionals  | APPair = attribute parent pair | TODO: add support for k number of children
 for (APPair in 1:length(bayesianNetwork)){
   formulars[[APPair+1]] = paste("bf(", bayesianNetwork[[APPair]][[1]], " ~ ", bayesianNetwork[[APPair]][[2]][[1]], sep="")
@@ -64,12 +60,6 @@ for (APPair in 1:length(bayesianNetwork)){
 #   syn_normal_brms()      : Fits a stan_glm to the data ("norm" distribution) 
 #   syn_multinomial_brms() : Fits a brm to the data ("multinom" distribution)
 #   syn_pois_brms()        : Fits a brm to the data ("pois" distribution)
-
-
-#synthesis structure:
-#synthesis_name = syn_method(realData, synthetheticData, formular, m)
-#example:
-#synthesis_ssn = syn_normal_brms(CEData, CEData_syn, bf(ssn ~ gender + dateofbirth, m = 1))
 
 
 #Synthesise based on the formulars
