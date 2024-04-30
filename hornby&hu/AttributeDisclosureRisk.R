@@ -19,17 +19,25 @@ require(IdentificationRiskCalculation)
 install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
-#Set current directory
+#Set directory
 current_directory <- getwd()
 parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
 plot_directory    <- file.path(parent_directory, "plots")
 
-#Load synthetic data, and data description
-#Need to have a synthetic dataset (synthetic_data.csv) in current directory
 
-file <- file.path(data_directory, "synthetic_data_origin.csv")
-CEdata_syn = read.csv(file)
+# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
+privbayesModel           <- fromJSON(file.path(data_directory, "description.json"))
+meta                     <- privbayesModel[[1]] #[#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
+attributeDescription     <- privbayesModel[[2]]
+bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent1], [parent2], ... [parentk]]]
+conditionalProbabilities <- privbayesModel[[4]]
+
+#Load synthetic data, and data description and cut real data 
+#real_Data <- read.csv(file.path(data_directory, "synthetic_data_origin.csv"))[1:meta[[1]], ]
+#syn_Data  <- read.csv(file.path(data_directory, "synthetic_data.csv"))
+
+CEdata_syn = read.csv(file.path(data_directory, "synthetic_data_origin.csv"))
 #Using synthesised data made using PrivBayes on CEData
 CEData_cut = subset(CEdata[1:200, ], )
 #Take only first 200 rows
@@ -39,24 +47,17 @@ CEdata_syn_cut <- CEdata_syn[1:200, ]
 privbayesModel <- fromJSON(file.path(data_directory, "description.json"))
 
 
-draws_cont = list()
-draws_cont1 = list()
-draws_cont2 = list()
-draws_cont3 = list()
-draws_cont4 = list()
-
 #List of formulars
 formulars = list()
 # Add the root conditionals(node + parent) to the list formulars (0 parents)
-formulars[[1]] = paste("bf(", privbayesModel[[3]][[1]][[2]], " ~ 1)", sep="")
-
-# Add other conditionals TODO: add support for k number of children
-for (i in 1:length(privbayesModel[[3]])){
-  formulars[[i+1]] = paste("bf(", privbayesModel[[3]][[i]][[1]], " ~ ", privbayesModel[[3]][[i]][[2]][[1]], sep="")
-  if (length(privbayesModel[[3]][[i]][[2]]) > 1){
-    formulars[[i+1]] = paste(formulars[[i+1]], " + ", privbayesModel[[3]][[i]][[2]][[2]], sep="")
+formulars[[1]] = paste("bf(", bayesianNetwork[[1]][[2]], " ~ 1)", sep="")
+# Add other conditionals  | APPair = attribute parent pair | TODO: add support for k number of children
+for (APPair in 1:length(bayesianNetwork)){
+  formulars[[APPair+1]] = paste("bf(", bayesianNetwork[[APPair]][[1]], " ~ ", bayesianNetwork[[APPair]][[2]][[1]], sep="")
+  if (length(bayesianNetwork[[APPair]][[2]]) > 1){
+    formulars[[APPair+1]] = paste(formulars[[APPair+1]], " + ", bayesianNetwork[[APPair]][[2]][[2]], sep="")
   }
-  formulars[[i+1]] = paste(formulars[[i+1]], ")", sep="")
+  formulars[[APPair+1]] = paste(formulars[[APPair+1]], ")", sep="")
 }
 
 # Models from ModelFitting.R that can be used for synthesising and/or fitting:
@@ -68,13 +69,11 @@ for (i in 1:length(privbayesModel[[3]])){
 #Root node LogIncome
 
 #Synthesise based on the formulars
-formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
+formula_str <- paste("synthesis_", bayesianNetwork[[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
 eval(parse(text = formula_str))
-print(parse(text = formula_str))
-for (i in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i]], ", m = 1)", sep="")
+for (APPair in 2:(length(formulars))){
+  formula_str <- paste("synthesis_", bayesianNetwork[[APPair-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[APPair]], ", m = 1)", sep="")
   eval(parse(text = formula_str))
-  print(parse(text = formula_str))
 }
 
 #synthesis_LogIncome = syn_normal_brms(CEData_cut, 
@@ -105,11 +104,11 @@ for (i in 2:(length(formulars))){
 #)
 
 #UrbanRural     has parents ['Race', 'LogIncome'].
-synthesis_UrbanRural = syn_normal_brms(CEData_cut, 
-                                 CEdata_syn_cut,
-                                 bf(UrbanRural ~ Race + LogIncome),
-                                 m = 1
-)
+#synthesis_UrbanRural = syn_normal_brms(CEData_cut, 
+#                                 CEdata_syn_cut,
+#                                 bf(UrbanRural ~ Race + LogIncome),
+#                                 m = 1
+#)
 
 CEdata_syn_cut = list(CEdata_syn_cut)
 
@@ -120,6 +119,12 @@ CEdata_syn_cut = list(CEdata_syn_cut)
 #H <- 50
 
 print("Measuring AttributeDisclosureRisk")
+
+draws_cont = list()
+draws_cont1 = list()
+draws_cont2 = list()
+draws_cont3 = list()
+draws_cont4 = list()
 
 #Store the draws for synthesis. 
 #If we have multiple formulas in AttributeRisk():
