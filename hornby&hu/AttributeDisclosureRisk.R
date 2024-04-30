@@ -29,22 +29,17 @@ plot_directory    <- file.path(parent_directory, "plots")
 # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
 privbayesModel           <- fromJSON(file.path(data_directory, "description.json"))
 meta                     <- privbayesModel[[1]] #[#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
-attributeDescription     <- privbayesModel[[2]]
-bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent1], [parent2], ... [parentk]]]
-conditionalProbabilities <- privbayesModel[[4]]
+attributeDescription     <- privbayesModel[[2]] #unused
+bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent_1], [parent_2], ... [parent_k]]]
+conditionalProbabilities <- privbayesModel[[4]] #unused
 
 #Load synthetic data, and data description and cut real data 
 #real_Data <- read.csv(file.path(data_directory, "synthetic_data_origin.csv"))[1:meta[[1]], ]
 #syn_Data  <- read.csv(file.path(data_directory, "synthetic_data.csv"))
 
-CEdata_syn = read.csv(file.path(data_directory, "synthetic_data_origin.csv"))
-#Using synthesised data made using PrivBayes on CEData
-CEData_cut = subset(CEdata[1:200, ], )
-#Take only first 200 rows
-CEdata_syn_cut <- CEdata_syn[1:200, ]
-
-# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
-privbayesModel <- fromJSON(file.path(data_directory, "description.json"))
+# Put data into dataframes
+real_data <- subset(CEdata[1:200, ], )
+syn_data  <- read.csv(file.path(data_directory, "synthetic_data_origin.csv"))[1:200, ]
 
 
 #List of formulars
@@ -69,10 +64,10 @@ for (APPair in 1:length(bayesianNetwork)){
 #Root node LogIncome
 
 #Synthesise based on the formulars
-formula_str <- paste("synthesis_", bayesianNetwork[[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
+formula_str <- paste("synthesis_", bayesianNetwork[[1]][[2]], " = syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep="")
 eval(parse(text = formula_str))
 for (APPair in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", bayesianNetwork[[APPair-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[APPair]], ", m = 1)", sep="")
+  formula_str <- paste("synthesis_", bayesianNetwork[[APPair-1]][[1]], " = syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep="")
   eval(parse(text = formula_str))
 }
 
@@ -110,7 +105,7 @@ for (APPair in 2:(length(formulars))){
 #                                 m = 1
 #)
 
-CEdata_syn_cut = list(CEdata_syn_cut)
+syn_data = list(syn_data)
 
 #G: Number of guesses  (the true confidential value plus 10 guesses in the neighborhood within a 20% range of the true confidential value)
 #G <- 11 
@@ -155,8 +150,8 @@ draws_cont4[[1]] = synthesis_UrbanRural[[2]]
 risk1 = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
                                               bf(LogExpenditure ~ LogIncome)
                                               ),
-                         origdata = CEData_cut,
-                         syndata = CEdata_syn_cut,
+                         origdata = real_data,
+                         syndata = syn_data,
                          posteriorMCMCs = draws_cont,
                          syntype = c("norm", "norm"),
                          G = c(11, 11),
@@ -165,8 +160,8 @@ risk1 = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
 print("twocontLELI")
 risk2 = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ LogIncome)
                                                   ),
-                        origdata = CEData_cut,
-                        syndata = CEdata_syn_cut,
+                        origdata = real_data,
+                        syndata = syn_data,
                         posteriorMCMCs = draws_cont1,
                         syntype = c("norm"),
                         G = c(11, 11),
@@ -178,8 +173,8 @@ risk2 = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ LogIncome)
 print("twocontKCLELI")
 risk3 = AttributeRisk(modelFormulas = list(bf(KidsCount ~ LogExpenditure + LogIncome)
                                                ),
-                         origdata = CEData_cut,
-                         syndata = CEdata_syn_cut,
+                         origdata = real_data,
+                         syndata = syn_data,
                          posteriorMCMCs = draws_cont2,
                          syntype = c("norm"),
                          G = c(11, 11),
@@ -187,8 +182,8 @@ risk3 = AttributeRisk(modelFormulas = list(bf(KidsCount ~ LogExpenditure + LogIn
                          )
 print("twocontRLELI")
 risk4 = AttributeRisk(modelFormulas = list(bf(Race ~ LogExpenditure + LogIncome)),
-                          origdata = CEData_cut,
-                          syndata = CEdata_syn_cut,
+                          origdata = real_data,
+                          syndata = syn_data,
                           posteriorMCMCs = draws_cont3,
                           syntype = c("norm"),
                           G = c(11, 11),
@@ -196,8 +191,8 @@ risk4 = AttributeRisk(modelFormulas = list(bf(Race ~ LogExpenditure + LogIncome)
                           )
 print("twocontURRLI")
 risk5 = AttributeRisk(modelFormulas = list(bf(UrbanRural ~ Race + LogIncome)),
-                          origdata = CEData_cut,
-                          syndata = CEdata_syn_cut,
+                          origdata = real_data,
+                          syndata = syn_data,
                           posteriorMCMCs = draws_cont4,
                           syntype = c("norm"),
                           G = c(11, 11),
