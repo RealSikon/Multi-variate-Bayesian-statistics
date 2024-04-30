@@ -2,7 +2,7 @@
 #as provided by https://arxiv.org/pdf/2103.09805.pdf
 
 #Installation of standard packages:
-#Install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress", jsonlite))
+#Install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress"))
 library(synthpop)
 library(devtools)
 library(rstanarm)
@@ -19,7 +19,7 @@ require(IdentificationRiskCalculation)
 install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
-#Set directories
+#Set current directory
 current_directory <- getwd()
 parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
@@ -27,6 +27,7 @@ plot_directory    <- file.path(parent_directory, "plots")
 
 #Load synthetic data, and data description
 #Need to have a synthetic dataset (synthetic_data.csv) in current directory
+
 file <- file.path(data_directory, "synthetic_data_origin.csv")
 CEdata_syn = read.csv(file)
 #Using synthesised data made using PrivBayes on CEData
@@ -35,10 +36,10 @@ CEData_cut = subset(CEdata[1:200, ], )
 CEdata_syn_cut <- CEdata_syn[1:200, ]
 
 # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
-privbayesModel           <- fromJSON(file.path(data_directory, "description.json"))
+privbayesModel <- fromJSON(file.path(data_directory, "description.json"))
 meta                     <- privbayesModel[[1]]
 attributeDescription     <- privbayesModel[[2]]
-bayesianNetwork          <- privbayesModel[[3]] #[[child], [[parent1], [parent2], .. [parentk]]]
+bayesianNetwork          <- privbayesModel[[3]]
 conditionalProbabilities <- privbayesModel[[4]]
 
 
@@ -47,13 +48,13 @@ formulars = list()
 # Add the root conditionals(node + parent) to the list formulars (0 parents)
 formulars[[1]] = paste("bf(", bayesianNetwork[[1]][[2]], " ~ 1)", sep="")
 
-# Add other conditionals  | APPair = attribute parent pair | TODO: add support for k number of children
-for (APPair in 1:length(bayesianNetwork)){
-  formulars[[APPair+1]] = paste("bf(", bayesianNetwork[[APPair]][[1]], " ~ ", bayesianNetwork[[APPair]][[2]][[1]], sep="")
-  if (length(bayesianNetwork[[APPair]][[2]]) > 1){
-    formulars[[APPair+1]] = paste(formulars[[APPair+1]], " + ", bayesianNetwork[[APPair]][[2]][[2]], sep="")
+# Add other conditionals TODO: add support for k number of children
+for (i in 1:length(bayesianNetwork)){
+  formulars[[i+1]] = paste("bf(", bayesianNetwork[[i]][[1]], " ~ ", bayesianNetwork[[i]][[2]][[1]], sep="")
+  if (length(bayesianNetwork[[i]][[2]]) > 1){
+    formulars[[i+1]] = paste(formulars[[i+1]], " + ", bayesianNetwork[[i]][[2]][[2]], sep="")
   }
-  formulars[[APPair+1]] = paste(formulars[[APPair+1]], ")", sep="")
+  formulars[[i+1]] = paste(formulars[[i+1]], ")", sep="")
 }
 
 # Models from ModelFitting.R that can be used for synthesising and/or fitting:
@@ -63,10 +64,10 @@ for (APPair in 1:length(bayesianNetwork)){
 
 
 #Synthesise based on the formulars
-formula_str <- paste("synthesis_", bayesianNetwork[[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
+formula_str <- paste("synthesis_", privbayesModel[[3]][[1]][[2]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[1]], ", m = 1)", sep="")
 eval(parse(text = formula_str))
-for (APPair in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", bayesianNetwork[[APPair-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[APPair]], ", m = 1)", sep="")
+for (i in 2:(length(formulars))){
+  formula_str <- paste("synthesis_", privbayesModel[[3]][[i-1]][[1]], " = syn_normal_brms(CEData_cut, CEdata_syn_cut, ", formulars[[i]], ", m = 1)", sep="")
   eval(parse(text = formula_str))
 }
 
