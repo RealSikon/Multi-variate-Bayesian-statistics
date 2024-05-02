@@ -14,9 +14,9 @@ source("PlotFunctions.R")
 source("ModelFitting.R")
 
 #Installation of packages provided by Ryan Hornby:
-install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
+#install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
 require(IdentificationRiskCalculation)
-install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
+#install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 require(AttributeRiskCalculation)
 
 #Set directory
@@ -38,6 +38,7 @@ conditionalProbabilities <- privbayesModel[[4]] #unused
 #syn_Data  <- read.csv(file.path(data_directory, "synthetic_data.csv"))
 
 # Put data into dataframes
+#Might not be an issue but syn_data is a list with a dataframe and not "just" a dataframe
 real_data <- subset(CEdata[1:200, ], )
 syn_data  <- read.csv(file.path(data_directory, "synthetic_data_origin.csv"))[1:200, ]
 
@@ -62,12 +63,17 @@ for (APPair in 1:length(bayesianNetwork)){
 
 
 #Root node LogIncome
+formular_parameters = list()
 
+synthesis_list <- list()
+synthesis_name <- list()
 #Synthesise based on the formulars
-formula_str <- paste("synthesis_", bayesianNetwork[[1]][[2]], " = syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep="")
+formula_str <- paste("synthesis_list[[1]] = syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep="")
+synthesis_name[[1]] <- paste("syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep="")
 eval(parse(text = formula_str))
 for (APPair in 2:(length(formulars))){
-  formula_str <- paste("synthesis_", bayesianNetwork[[APPair-1]][[1]], " = syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep="")
+  formula_str <- paste("synthesis_list[[", APPair, "]] = syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep="")
+  synthesis_name[[APPair]] <- paste("syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep="")
   eval(parse(text = formula_str))
 }
 
@@ -115,7 +121,7 @@ syn_data = list(syn_data)
 
 print("Measuring AttributeDisclosureRisk")
 
-draws_cont = list()
+draws_cont  = list()
 draws_cont1 = list()
 draws_cont2 = list()
 draws_cont3 = list()
@@ -123,13 +129,17 @@ draws_cont4 = list()
 
 #Store the draws for synthesis. 
 #If we have multiple formulas in AttributeRisk():
-draws_cont[[1]] = synthesis_LogIncome[[2]]
-draws_cont[[2]] = synthesis_LogExpenditure[[2]]
+#for (synthesis in 1:(length(synthesis_list))){
+#  draws_cont[[synthesis]] <- synthesis_list[[synthesis]][[2]] 
+#}
+
+draws_cont[[1]] <- synthesis_list[[1]][[2]]
+draws_cont[[2]] <- synthesis_list[[2]][[2]]
 #If we use individual formulas in AttributeRisk()
-draws_cont1[[1]] = synthesis_LogExpenditure[[2]]
-draws_cont2[[1]] = synthesis_KidsCount[[2]]
-draws_cont3[[1]] = synthesis_Race[[2]]
-draws_cont4[[1]] = synthesis_UrbanRural[[2]]
+draws_cont1[[1]] <- synthesis_list[[2]][[2]]
+draws_cont2[[1]] <- synthesis_list[[3]][[2]]
+draws_cont3[[1]] <- synthesis_list[[4]][[2]]
+draws_cont4[[1]] <- synthesis_list[[5]][[2]]
 #This does not work:
 # Two_Cont = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
 #                                               bf(LogExpenditure ~ LogIncome),
@@ -147,6 +157,7 @@ draws_cont4[[1]] = synthesis_UrbanRural[[2]]
 #                         )
 #Estimate attribute disclosure risk of LogIncome and LogExpenditure
 #Something is going wrong here
+
 risk1 = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
                                               bf(LogExpenditure ~ LogIncome)
                                               ),
@@ -158,6 +169,7 @@ risk1 = AttributeRisk(modelFormulas = list(bf(LogIncome ~ 1),
                          H = 1
                          )
 print("twocontLELI")
+
 risk2 = AttributeRisk(modelFormulas = list(bf(LogExpenditure ~ LogIncome)
                                                   ),
                         origdata = real_data,
@@ -202,7 +214,6 @@ risk5 = AttributeRisk(modelFormulas = list(bf(UrbanRural ~ Race + LogIncome)),
 
 print("Making plots")
 risk_list <- list(risk1, risk2, risk3, risk4, risk5)
-x <- length(risk_list)
 
 # randomGuessPlot(risks[[i]])
 #' Produces a graph of the probabilities of each guess with a line indicating 
@@ -210,7 +221,7 @@ x <- length(risk_list)
 #' guesses.
 #' Density of the joint posterior probability of correctly guessing the true
 #' value of both LogIncome and LogExpenditure. The vertical line shows the prior probability of 1/121.
-for (j in 1:x){
+for (j in 1:length(risk_list)){
   plotName <- paste("randomguessPlot", j, ".png", sep = "")
   ggsave(plotName, device = "png", randomGuessPlot(risk_list[[j]]), path = plot_directory)
 }
@@ -219,7 +230,7 @@ for (j in 1:x){
 # posteriorRankPlot(risks[[i]]):
 #' The rank of posterior probability of the true pair of values 
 #' (of LogIncome and LogExpenditure being guessed correctly, among 121 (11*11) guesses)
-for (j in 1:x){
+for (j in 1:length(risk_list)){
   plotName <- paste("posteriorRankPlot", j, ".png", sep = "")
   ggsave(plotName, device = "png", posteriorRankPlot(risk_list[[j]]), path = plot_directory)
 }
@@ -227,7 +238,7 @@ for (j in 1:x){
 #Print first two plots for all formulas
 
 
-# marginalPosteriorProbabilitiesPlot(risks[[i]]):
+#marginalPosteriorProbabilitiesPlot(risks[[i]]):
 #' Density of the marginal posterior probabilities of correctly guessing the
 #' true value (of LogIncome and LogExpenditure, respectively). The vertical line shows
 #' the prior probability (of 1/11).
