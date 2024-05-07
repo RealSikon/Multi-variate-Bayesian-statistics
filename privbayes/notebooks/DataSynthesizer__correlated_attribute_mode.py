@@ -32,7 +32,7 @@ parent_directory  = os.path.dirname(current_directory)
 parent_directory  = os.path.dirname(parent_directory)
 data_directory    = os.path.join(parent_directory, 'data')
 
-input_data        = os.path.join(data_directory, 'CEData.csv')
+input_data        = os.path.join(data_directory, 'adult_tiny.csv')
 synthetic_data    = os.path.join(data_directory, 'synthetic_data.csv')
 description_file  = os.path.join(data_directory, 'description.json')
 
@@ -45,7 +45,7 @@ description_file  = os.path.join(data_directory, 'description.json')
 threshold_value = 20
 
 # specify categorical attributes
-categorical_attributes = {'UrbanRural': True, 'Race': True, 'KidsCount': True}
+categorical_attributes = {'education': True, 'sex': True, 'relationship': True, 'marital_status': True, 'income': True}
 
 # specify which attributes are candidate keys of input dataset.
 candidate_keys = {'': True}

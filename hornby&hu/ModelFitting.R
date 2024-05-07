@@ -5,7 +5,7 @@ syn_normal_brms = function(orig_data,         #Real dataset
                            syn_data,          #Synthetic dataset
                            model_brms,        #Formula to be used for synthesis
                            chains = 1,        #Number of chains to be used in regression model
-                           iterations = 1000, #Iterations used to fit regression model
+                           iterations = 20, #Iterations used to fit regression model | original 1000
                            m = 20,            #Number of iterations over samples
                            thin = 5           #the thinning interval (i.e., the number of iterations to skip between samples)
 ) 

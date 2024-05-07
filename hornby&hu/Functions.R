@@ -7,3 +7,7 @@ string_parser <- function(evalstring) {
 data_loader <- function(data, cut) {
   return(read.csv(file.path(data_directory, data))[1:cut, ])
 }
+
+desc_loader <- function(data){
+  return(fromJSON(file.path(data_directory, data)))
+}

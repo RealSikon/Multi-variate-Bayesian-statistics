@@ -9,6 +9,9 @@ library(rstanarm)
 library(brms)
 library(ggplot2)
 library(jsonlite)
+library(progress)
+library(matrixStats)
+library(arrayhelpers)
 # Auxiliary functions
 source("PlotFunctions.R")
 source("ModelFitting.R")
@@ -18,7 +21,14 @@ source("Functions.R")
 # install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
 require(IdentificationRiskCalculation)
 # install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
-require(AttributeRiskCalculation)
+#require(AttributeRiskCalculation)
+
+source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\R\\multiproduct.R")
+#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\AttributeRiskForRecordI.Rd")
+#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\AttributeRisk.Rd")
+#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\RandomGuessPlot.Rd")
+
+
 
 # Set directory
 current_directory <- getwd()
@@ -26,19 +36,25 @@ parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
 plot_directory    <- file.path(parent_directory, "plots")
 
-real_data_name <- "CEData.csv"
-syn_data_name  <- "synthetic_data.csv"
-
-real_data <- data_loader(real_data_name, 200)
-syn_data  <- data_loader(syn_data_name, 200)
-
-# Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
-privbayes_model           <- fromJSON(file.path(data_directory, "description.json"))
-meta                      <- privbayes_model[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
-attribute_description     <- privbayes_model[[2]] # unused
-bayesian_network          <- privbayes_model[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
-conditional_probabilities <- privbayes_model[[4]] # unused
-
+useknowngood <- FALSE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
+if (useknowngood) {
+  print("Using known good")
+  #data_loader(file_name, cut) cut needs to be less or equal to real dataset
+  real_data <- data_loader("kgreal.csv", 100)
+  syn_data  <- data_loader("kgsyn.csv", 100)
+  
+  # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
+  meta             <- desc_loader("kgdesc.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
+  bayesian_network <- desc_loader("kgdesc.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
+} else {
+  #data_loader(file_name, cut) cut needs to be less or equal to real dataset
+  real_data <- data_loader("cereal_num.csv", 30)
+  syn_data  <- data_loader("synthetic_data.csv", 30)
+  
+  # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
+  meta             <- desc_loader("description.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
+  bayesian_network <- desc_loader("description.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
+}
 
 # List of formulars
 formulars <- list()
@@ -66,9 +82,9 @@ for (APPair in seq_along(bayesian_network)) {
 # Root node LogIncome
 synthesis_list <- list()
 # Synthesise based on the formulars
-string_parser(paste("synthesis_list[[1]] = syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep = ""))
+synthesis_list[[1]] <- string_parser(paste("synthesis_list[[1]] = syn_normal_brms(real_data, syn_data, ", formulars[[1]], ", m = 1)", sep = ""))
 for (APPair in 2:(length(formulars))) {
-  string_parser(paste("synthesis_list[[", APPair, "]] = syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep = ""))
+  synthesis_list[[APPair]] <- string_parser(paste("synthesis_list[[", APPair, "]] = syn_normal_brms(real_data, syn_data, ", formulars[[APPair]], ", m = 1)", sep = ""))
 }
 
 syn_data <- list(syn_data)
@@ -81,26 +97,18 @@ syn_data <- list(syn_data)
 
 print("Measuring AttributeDisclosureRisk")
 
-draws_conts <- list()
-
-# Store the draws for synthesis.
-# If we have multiple formulas in AttributeRisk():
-for (synthesis in seq_along(synthesis_list)) {
-  draws_conts[[synthesis]] <- synthesis_list[[synthesis]][[2]]
-}
-
 risk_list <- list()
 
-for (formular in seq_along(formulars)) {
-  risk_list[[formular]] <- AttributeRisk(
-     modelFormulas = string_parser(paste("list(", formulars[[formular]], ")", sep = "")),
-          origdata = real_data,
-           syndata = syn_data,
-    posteriorMCMCs = draws_conts[formular],
-           syntype = c("norm", "norm"),
-                 G = c(11, 11),
-                 H = 1
-    )
+for (i in seq_along(formulars)) {
+  risk_list[[i]] <- AttributeRisk(
+    modelFormulas = string_parser(paste("list(", formulars[[i]], ")", sep = "")),
+    origdata = real_data,
+    syndata = syn_data,
+    posteriorMCMCs = synthesis_list[[i]][2], # Draws
+    syntype = c("norm", "norm"),
+    G = 11,
+    H = 1
+  )
 }
 
 print("Generating plots")
@@ -110,19 +118,19 @@ print("Generating plots")
 for (risk in seq_along(risk_list)) {
   #' Density of the joint posterior probability of correctly guessing the true
   #' value of both LogIncome and LogExpenditure. The vertical line shows the prior probability of 1/121.
-  ggsave(paste(name, nodes[[risk]], ".png", sep = ""),
+  ggsave(paste("randomGuessPlot", nodes[[risk]], ".png", sep = ""),
          device = "png",
          randomGuessPlot(risk_list[[risk]]),
          path = plot_directory
-         )
-         
+  )
+  
   #' The rank of posterior probability of the true pair of values
   #' (of LogIncome and LogExpenditure being guessed correctly, among 121 (11*11) guesses)
-  ggsave(paste(name, nodes[[risk]], ".png", sep = ""),
+  ggsave(paste("posteriorRankPlot", nodes[[risk]], ".png", sep = ""),
          device = "png",
          posteriorRankPlot(risk_list[[risk]]),
          path = plot_directory
-         )
+  )
 }
 
 # marginalPosteriorProbabilitiesPlot(risks[[i]]):
