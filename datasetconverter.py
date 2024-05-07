@@ -1,11 +1,10 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-def main(dataset_path, labels_to_encode):
+def main(dataset_name, dataset_path, labels_to_encode):
    # Creating a instance of label Encoder.
    le = LabelEncoder()
 
-   print('Converting ' + dataset_path +'.csv ' + 'to numeric')
    #importing data using .read_csv() function
    df = pd.read_csv(dataset_path + '.csv')
 
@@ -25,9 +24,8 @@ def main(dataset_path, labels_to_encode):
    # printing Dataframe
    num_dataset_path = dataset_path + '_num.csv'
    df.to_csv((num_dataset_path), index=False)
-   print('Numeric dataset: ' + num_dataset_path)
    
-   return(num_dataset_path)
+   return(dataset_name + '_num.csv')
 
 
 if __name__ == '__main__':
