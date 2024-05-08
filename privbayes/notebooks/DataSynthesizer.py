@@ -7,11 +7,12 @@ import pandas as pd
 import os
 
 def main(dataset_name, data_directory, threshold_value, categorical_attributes, candidate_keys, epsilon, degree_of_bayesian_network, num_tuples_to_generate):
-   description_file = data_directory + '\\description.json'
+   real_data        = data_directory + '\\' + dataset_name
    synthetic_data   = data_directory + '\\synthetic_data.csv'
+   description_file = data_directory + '\\description.json'
 
    describer = DataDescriber(category_threshold=threshold_value)
-   describer.describe_dataset_in_correlated_attribute_mode(dataset_file=data_directory + '\\' + dataset_name, 
+   describer.describe_dataset_in_correlated_attribute_mode(dataset_file=real_data, 
                                                          epsilon=epsilon, 
                                                          k=degree_of_bayesian_network,
                                                          attribute_to_is_categorical=categorical_attributes,
