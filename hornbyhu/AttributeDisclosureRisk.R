@@ -1,8 +1,5 @@
-# This is code for measuring the attribute disclosure risk of synthetic datasets,
-# as provided by https://arxiv.org/pdf/2103.09805.pdf
-
 # Installation of standard packages:
-# Install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress"))
+# Install.packages(c("rstanarm", "brms", "synthpop", "arrayhelpers", "ggplot2", "arrayhelpers", "matrixStats", "progress", "here"))
 library(synthpop)
 library(devtools)
 library(rstanarm)
@@ -12,10 +9,34 @@ library(jsonlite)
 library(progress)
 library(matrixStats)
 library(arrayhelpers)
+library(here)
+
+# This is code for measuring the attribute disclosure risk of synthetic datasets,
+# as provided by https://arxiv.org/pdf/2103.09805.pdf
+
+# Obtains path from python script
+args = commandArgs(trailingOnly=TRUE)
+
+# Enables execution both in python and Rstudio
+if (length(args) == length(character(0))){
+  args[1] = here()
+  print(args[1])
+}
+
+path = args[1]
+
+# Set directory
+current_directory <- path
+parent_directory  <- dirname(current_directory)
+data_directory    <- file.path(parent_directory, "data")
+plot_directory    <- file.path(parent_directory, "plots")
+
+
 # Auxiliary functions
-source("PlotFunctions.R")
-source("ModelFitting.R")
-source("Functions.R")
+source(paste(path, "/AttributeRiskCalculation/R/multiproduct.R", sep = ""))
+source(paste(path, "/Functions.R",     sep = ""))
+source(paste(path, "/ModelFitting.R",  sep = ""))
+source(paste(path, "/PlotFunctions.R", sep = ""))
 
 # Installation of packages provided by Ryan Hornby:
 # install_github("https://github.com/RyanHornby/IdentificationRiskCalculation")
@@ -23,20 +44,7 @@ require(IdentificationRiskCalculation)
 # install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 #require(AttributeRiskCalculation)
 
-source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\R\\multiproduct.R")
-#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\AttributeRiskForRecordI.Rd")
-#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\AttributeRisk.Rd")
-#source("C:\\Users\\Silas\\Documents\\GitHub\\OOP\\Multi-variate-Bayesian-statistics\\hornby&hu\\AttributeRiskCalculation\\man\\RandomGuessPlot.Rd")
-
-
-
-# Set directory
-current_directory <- getwd()
-parent_directory  <- dirname(current_directory)
-data_directory    <- file.path(parent_directory, "data")
-plot_directory    <- file.path(parent_directory, "plots")
-
-useknowngood <- FALSE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
+useknowngood <- TRUE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
 if (useknowngood) {
   print("Using known good")
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset

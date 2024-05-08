@@ -33,7 +33,7 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    adr_location = parent_directory + "\hornbyhu\AttributeDisclosureRisk.R"
 
    #powershell command for executing hornbyhu
-   cmd = r"{} --vanilla {}".format(rscript_location, adr_location)
+   cmd = r"{} --vanilla {} {}".format(rscript_location, adr_location, (parent_directory + "\hornbyhu"))
 
    if dataset_is_numeric == False:
       print('Converting ' + dataset_name +'.csv ' + 'to numeric as ' + dataset_name + '_num.csv')
@@ -46,5 +46,5 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
       print('Generating histograms between real and synthetic data')
       plotgenerator.main(dataset_name, data_directory)
       
-   print('Executing Hornby&Hu')
+   print('Executing HornbyHu')
    os.system(cmd)
