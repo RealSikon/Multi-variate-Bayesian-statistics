@@ -29,7 +29,7 @@ path = args[1]
 current_directory <- path
 parent_directory  <- dirname(current_directory)
 data_directory    <- file.path(parent_directory, "data")
-plot_directory    <- file.path(parent_directory, "plots")
+plot_directory    <- file.path(parent_directory, "plots/hornbyhu")
 
 
 # Auxiliary functions
@@ -44,7 +44,7 @@ require(IdentificationRiskCalculation)
 # install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 #require(AttributeRiskCalculation)
 
-useknowngood <- TRUE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
+useknowngood <- FALSE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
 if (useknowngood) {
   print("Using known good")
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
@@ -55,13 +55,13 @@ if (useknowngood) {
   meta             <- desc_loader("kgdesc.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
   bayesian_network <- desc_loader("kgdesc.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
 } else {
-  #data_loader(file_name, cut) cut needs to be less or equal to real dataset
-  real_data <- data_loader("cereal_num.csv", 30)
-  syn_data  <- data_loader("synthetic_data.csv", 30)
   
   # Load JSON data, Contains: [meta, attribute description, Bayesian network, conditional probabilities]
   meta             <- desc_loader("description.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
   bayesian_network <- desc_loader("description.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
+  #data_loader(file_name, cut) cut needs to be less or equal to real dataset
+  real_data <- data_loader(args[2], 30)
+  syn_data  <- data_loader("synthetic_data.csv", 30)
 }
 
 # List of formulars

@@ -6,8 +6,8 @@ import privbayes.notebooks.datasynthesizer as privbayes
 if __name__ == '__main__': # This line is to stop Privbayes from spawning infinite threads
    ## Global variables ##
    dataset_name        = 'adult_tiny'
-   dataset_is_numeric  = False
-   generate_histograms = False
+   dataset_is_numeric  = False # hornbyhu required numeric datasets
+   generate_histograms = False # generates histograms and correlation matrices from privbayes
 
    # paths for the I/O files
    current_file_path = (__file__)
@@ -32,19 +32,21 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    rscript_location = '"C:\Program Files\R\R-4.3.2\\bin\Rscript"'
    adr_location = parent_directory + "\hornbyhu\AttributeDisclosureRisk.R"
 
-   #powershell command for executing hornbyhu
-   cmd = r"{} --vanilla {} {}".format(rscript_location, adr_location, (parent_directory + "\hornbyhu"))
-
    if dataset_is_numeric == False:
       print('Converting ' + dataset_name +'.csv ' + 'to numeric as ' + dataset_name + '_num.csv')
       dataset_name = datasetconverter.main(dataset_name, dataset_path, labels_to_encode)
 
+   print(dataset_name)
    print('Executing PrivBayes')
-   #privbayes.main(dataset_name, data_directory, threshold_value, categorical_attributes, candidate_keys, epsilon, degree_of_bayesian_network, num_tuples_to_generate)
+   privbayes.main(dataset_name, data_directory, threshold_value, categorical_attributes, candidate_keys, epsilon, degree_of_bayesian_network, num_tuples_to_generate)
 
    if generate_histograms == True:
       print('Generating histograms between real and synthetic data')
       plotgenerator.main(dataset_name, data_directory)
       
    print('Executing HornbyHu')
+   #powershell command for executing hornbyhu
+   #rscript_location --vanilla attributedisclosurerisk.r_location, hornbyhu_location, dataset_name
+   hornbyhu_args = [parent_directory + "\hornbyhu", dataset_name]
+   cmd = r"{} --vanilla {} {} {}".format(rscript_location, adr_location, hornbyhu_args[0], hornbyhu_args[1])
    os.system(cmd)
