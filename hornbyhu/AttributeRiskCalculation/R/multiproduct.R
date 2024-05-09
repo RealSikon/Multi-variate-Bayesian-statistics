@@ -137,7 +137,6 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
     for (k in 1:length(is_synthesized)) {
       if (is_synthesized[k] %in% paste(text=modelFormulas[[j]]$formula[[3]])) {
         temp = append(temp, is_synthesized[k])
-        #print(temp)
       }
     }
     synthesized_predictors[[j]] = temp
@@ -215,7 +214,7 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
       
       
       #print(y_i[[1]])
-      
+      #print(densityCalc(y_i[[1]], syntype[1], orig_mean[[1]], posteriorMCMCs[[1]][, "sigma"], D[1], posteriorMCMCs[[1]]))
       q_sum_H = (densityCalc(y_i_guesses[[1]][((j-1) %% D[1])+1], syntype[1], guessed, posteriorMCMCs[[1]][, "sigma"], D[1], posteriorMCMCs[[1]])
                  /densityCalc(y_i[[1]], syntype[1], orig_mean[[1]], posteriorMCMCs[[1]][, "sigma"], D[1], posteriorMCMCs[[1]]))
       
@@ -224,12 +223,13 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
       
       if (length(modelFormulas) > 1) {  
         for (l in 2:length(modelFormulas)) {
-          #print("Orig Row:")
+          print("Orig Row:")
           #print(X_i_org[[l]][i, ])
           guessed = guessed_mean(origdata, i, as.formula(modelFormulas[[l]]), currentGuesses, synthesized_predictors, posteriorMCMCs, syntype, l, -1)
           
           q_sum_H = q_sum_H * (densityCalc(y_i_guesses[[l]][get_index(D, j, l)], syntype[l], guessed, posteriorMCMCs[[l]][, "sigma"], D[l], posteriorMCMCs[[l]])
                                /densityCalc(y_i[[l]], syntype[l], orig_mean[[l]], posteriorMCMCs[[l]][, "sigma"], D[l], posteriorMCMCs[[l]]))
+          #print(densityCalc(y_i[[l]], syntype[l], orig_mean[[l]], posteriorMCMCs[[l]][, "sigma"], D[l], posteriorMCMCs[[l]]))
           
         }
       }
@@ -244,6 +244,7 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
                                             as.matrix(X_i_syn[[l]][[m]]) %*% t(as.matrix(posteriorMCMCs[[l]][h , !names(posteriorMCMCs[[l]]) %in% c("sigma")])),
                                             posteriorMCMCs[[l]][h, "sigma"], D[l], posteriorMCMCs[[l]][h, ])
           } else {
+            # Almost certain code goes wrong here
             log_p_h = log_p_h * densityCalc(syndata[[m]][, paste(text = modelFormulas[[l]]$formula[[2]])], syntype[l], 
                                            as.matrix(X_i_syn[[l]][[m]]) %*% t(as.matrix(posteriorMCMCs[[l]][h , !names(posteriorMCMCs[[l]]) %in% c("sigma")])),
                                            posteriorMCMCs[[l]][h, "sigma"], D[l], posteriorMCMCs[[l]][h, ])
@@ -357,6 +358,10 @@ randomGuessPlot = function(risks, custom_palette = NULL) {
 
 densityCalc = function (x, type, otherArg1, otherArg2, otherArg3, otherArg4) {
   if (type == "norm") {
+    #print(dnorm(x, otherArg1, otherArg2))
+    #print(x)
+    #print(otherArg1)
+    #print(otherArg2)
     return(dnorm(x, otherArg1, otherArg2))
   } else if (type == "binom") {
     y = dbinom(x, 1, logistic(otherArg1))

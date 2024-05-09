@@ -20,6 +20,7 @@ args = commandArgs(trailingOnly=TRUE)
 # Enables execution both in python and Rstudio
 if (length(args) == length(character(0))){
   args[1] = here()
+  args[2] = "cereal_num.csv"
   print(args[1])
 }
 
@@ -108,14 +109,20 @@ print("Measuring AttributeDisclosureRisk")
 risk_list <- list()
 
 for (i in seq_along(formulars)) {
+  print(string_parser(paste("list(", formulars[[i]], ")", sep = "")))
   risk_list[[i]] <- AttributeRisk(
     modelFormulas = string_parser(paste("list(", formulars[[i]], ")", sep = "")),
     origdata = real_data,
     syndata = syn_data,
     posteriorMCMCs = synthesis_list[[i]][2], # Draws
-    syntype = c("norm", "norm"),
+    syntype = "norm",
+    H = 1,
     G = 11,
-    H = 1
+    additiveBounds = NULL, 
+    bounds = NULL,
+    guesses = NULL,
+    simplePrior = NULL,
+    categorical = NULL #c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   )
 }
 
