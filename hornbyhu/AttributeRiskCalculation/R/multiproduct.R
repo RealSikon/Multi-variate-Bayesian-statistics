@@ -245,9 +245,14 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
                                             posteriorMCMCs[[l]][h, "sigma"], D[l], posteriorMCMCs[[l]][h, ])
           } else {
             # Almost certain code goes wrong here
-            log_p_h = log_p_h * densityCalc(syndata[[m]][, paste(text = modelFormulas[[l]]$formula[[2]])], syntype[l], 
+            log_p_h <- log_p_h * densityCalc(syndata[[m]][, paste(text = modelFormulas[[l]]$formula[[2]])], syntype[l], 
                                            as.matrix(X_i_syn[[l]][[m]]) %*% t(as.matrix(posteriorMCMCs[[l]][h , !names(posteriorMCMCs[[l]]) %in% c("sigma")])),
                                            posteriorMCMCs[[l]][h, "sigma"], D[l], posteriorMCMCs[[l]][h, ])
+          }
+          for (v in 1:length(log_p_h)) {
+            if (log_p_h[v] < 1.00e-50) {
+                warning("PDF values are extremely low, this could indicate a poor GLM fit, consider increasing the iterations in ModelFitting.R")
+            }
           }
         }
         log_p_h = sum(log(log_p_h))
