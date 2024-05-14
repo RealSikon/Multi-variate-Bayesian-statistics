@@ -73,4 +73,15 @@ absoluteDifferencePlot = function(risks) {
   return(plt)
 }
 
+# Density plot
+density_plot = function(x, y) {
+  plt = ggplot(x, y) + 
+    theme(panel.background = element_rect(fill = "white", color = "black"),
+          panel.grid.major = element_line(color = "grey")) + 
+    labs(x = "value", y = "Density") +
+    ggtitle("density_plot")
+  
+  plt
+}
+
 

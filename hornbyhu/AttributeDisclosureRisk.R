@@ -45,7 +45,7 @@ require(IdentificationRiskCalculation)
 # install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 #require(AttributeRiskCalculation)
 
-useknowngood <- FALSE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
+useknowngood <- TRUE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
 if (useknowngood) {
   print("Using known good")
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
@@ -146,6 +146,10 @@ for (risk in seq_along(risk_list)) {
          posteriorRankPlot(risk_list[[risk]]),
          path = plot_directory
   )
+}
+
+for (v in seq_along(risk_list)) {
+  v
 }
 
 # marginalPosteriorProbabilitiesPlot(risks[[i]]):
