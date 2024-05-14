@@ -17,3 +17,9 @@ How to run:
 
 1. Install requirements.txt
 2. Run Main.py
+
+Troubleshooting # TODO add error codes
+   HornbyHu does not accept strings as values
+   low glm iterations can cause floating point errors potentially halting the code
+   attribute names can only be alphanumeric
+   real data and synthetic data needs to be the same size   

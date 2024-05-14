@@ -73,4 +73,8 @@ absoluteDifferencePlot = function(risks) {
   return(plt)
 }
 
+density_plot = function() {
+  
+}
+
 
