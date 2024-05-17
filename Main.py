@@ -5,8 +5,8 @@ import privbayes.notebooks.datasynthesizer as privbayes
 
 if __name__ == '__main__': # This line is to stop Privbayes from spawning infinite threads
    ## Global variables ##
-   dataset_name        = 'cereal' #there is an error where .csv is problematic when dataset_is_numeric is False
-   dataset_is_numeric  = False # hornbyhu required numeric datasets
+   dataset_name        = 'CEData.csv' #there is an error where .csv is problematic when dataset_is_numeric is False
+   dataset_is_numeric  = True # hornbyhu required numeric datasets
    generate_histograms = False # generates histograms and correlation matrices from privbayes
 
    # paths for the I/O files
@@ -16,14 +16,14 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    dataset_path      = os.path.join(data_directory, dataset_name)
 
    ## preprocessor variables ##
-   labels_to_encode = ['name', 'mfr', 'type']
+   labels_to_encode = []
 
    ## privbayes variables ##
    # An attribute is categorical if its domain size is less than this threshold.
    threshold_value            = 20
-   categorical_attributes     = {'mfr': True, 'type': True, 'shelf': True}
-   candidate_keys             = {'name': True}
-   epsilon                    = 1    # Differential privacy value
+   categorical_attributes     = {'UrbanRural': True, 'Race': True, 'Income': True}
+   candidate_keys             = {}
+   epsilon                    = 1000    # Differential privacy value
    degree_of_bayesian_network = 2    # Number of edges a node can have
    num_tuples_to_generate     = 1000 # Number of tuples generated in synthetic dataset. NOTE: This cannot be less than cut in Hornby&Hu, else an error is generated.
 

@@ -20,7 +20,7 @@ args = commandArgs(trailingOnly=TRUE)
 # Enables execution both in python and Rstudio
 if (length(args) == length(character(0))){
   args[1] = here()
-  args[2] = "cereal_num.csv"
+  args[2] = "CEData.csv"
   print(args[1])
 }
 
@@ -45,7 +45,7 @@ require(IdentificationRiskCalculation)
 # install_github("https://github.com/RyanHornby/AttributeRiskCalculation")
 #require(AttributeRiskCalculation)
 
-useknowngood <- TRUE #sometimes there is an index error, the reason is that in multiproduct.R log_p_h = -inf, more research is required
+useknowngood <- FALSE
 if (useknowngood) {
   print("Using known good")
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
@@ -61,8 +61,10 @@ if (useknowngood) {
   meta             <- desc_loader("description.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
   bayesian_network <- desc_loader("description.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
-  real_data <- data_loader(args[2], 30)
-  syn_data  <- data_loader("synthetic_data.csv", 30)
+  real_data <-  as.data.frame(data_loader(args[2], 1000))
+  syn_data  <-  as.data.frame(data_loader("synthetic_data.csv", 1000))
+  print(is.data.frame(real_data))
+  print(is.data.frame(syn_data))
 }
 
 # List of formulars
@@ -148,9 +150,11 @@ for (risk in seq_along(risk_list)) {
   )
 }
 
-for (v in seq_along(risk_list)) {
-  v
-}
+
+
+#for (v in seq_along(risk_list)) {
+#}
+
 
 # marginalPosteriorProbabilitiesPlot(risks[[i]]):
 #' Density of the marginal posterior probabilities of correctly guessing the

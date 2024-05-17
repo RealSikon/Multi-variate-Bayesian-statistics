@@ -75,11 +75,11 @@ absoluteDifferencePlot = function(risks) {
 
 # Density plot
 density_plot = function(real_att, syn_att) {
-  plt = ggplot(real_att, syn_att) + 
-    theme(panel.background = element_rect(fill = "white", color = "black"),
-          panel.grid.major = element_line(color = "grey")) + 
-    labs(x = "value", y = "Density") +
-    ggtitle("density_plot")
-  
-  plt
+  df <- data.frame(
+    value = c(real_att, syn_att)
+  )
+  print(df[[2]])
+  p <- ggplot(df, aes(x =.data[[2]])) + 
+    geom_density()
+  p
 }
