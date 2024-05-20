@@ -100,11 +100,26 @@ for (APPair in 2:(length(formulars))) {
 
 syn_data <- list(syn_data)
 
+
 # G: Number of guesses  (the true confidential value plus 10 guesses in the neighborhood within a 20% range of the true confidential value)
 # G <- 11
 
 # H: The number of posterior parameter draws in the importance sampling step.
 # H <- 50
+index_list <- list()
+for (i in 1:length(nodes)) {
+  index_list[i] <- which(nodes[i] == meta["all_attributes"][[1]])
+}
+
+guess_list = list()
+for (i in 1:length(real_data)){
+  if (length(unique(real_data[[i]])) <= 20){
+    guess_list[i] = length(unique(real_data[[i]]))
+  }
+   else{
+    guess_list[i] = 11
+   }
+}
 
 print("Measuring AttributeDisclosureRisk")
 
@@ -119,7 +134,7 @@ for (i in seq_along(formulars)) {
     posteriorMCMCs = synthesis_list[[i]][2], # Draws
     syntype = "norm",
     H = 1,
-    G = 11,
+    G = guess_list[[index_list[[i]]]],
     additiveBounds = NULL, 
     bounds = NULL,
     guesses = NULL,
