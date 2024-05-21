@@ -21,11 +21,11 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    ## privbayes variables ##
    # An attribute is categorical if its domain size is less than this threshold.
    threshold_value            = 20
-   categorical_attributes     = {'UrbanRural': True, 'Race': True, 'Income': True}
+   categorical_attributes     = {'UrbanRural': True, 'Race': True}
    candidate_keys             = {}
    epsilon                    = 1000    # Differential privacy value
    degree_of_bayesian_network = 2    # Number of edges a node can have
-   num_tuples_to_generate     = 1000 # Number of tuples generated in synthetic dataset. NOTE: This cannot be less than cut in Hornby&Hu, else an error is generated.
+   num_tuples_to_generate     = 5126 # Number of tuples generated in synthetic dataset. NOTE: This cannot be less than cut in Hornby&Hu, else an error is generated.
 
    ## hornbyhu ##
    # use '" "' quotes if there is a space in the directory like: '"C:\Program Files\R\R-4.3.2\\bin\Rscript"'
@@ -34,7 +34,7 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
 
    if dataset_is_numeric == False:
       print('Converting ' + dataset_name +'.csv ' + 'to numeric as ' + dataset_name + '_num.csv')
-      dataset_name = preprocessor.main(dataset_name, dataset_path, labels_to_encode, num_tuples_to_generate)
+      dataset_name = preprocessor.main(dataset_name, dataset_path, labels_to_encode)
 
    print(dataset_name)
    print('Executing PrivBayes')
@@ -44,9 +44,9 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
       print('Generating histograms between real and synthetic data')
       plotgenerator.main(dataset_name, data_directory)
       
-   print('Executing HornbyHu')
+   #print('Executing HornbyHu')
    #powershell command for executing hornbyhu
    #rscript_location --vanilla attributedisclosurerisk.r_location, hornbyhu_location, dataset_name
-   hornbyhu_args = [parent_directory + "\hornbyhu", dataset_name]
-   cmd = r"{} --vanilla {} {} {}".format(rscript_location, adr_location, hornbyhu_args[0], hornbyhu_args[1])
-   os.system(cmd)
+   #hornbyhu_args = [parent_directory + "\hornbyhu", dataset_name]
+   #cmd = r"{} --vanilla {} {} {}".format(rscript_location, adr_location, hornbyhu_args[0], hornbyhu_args[1])
+   #os.system(cmd)

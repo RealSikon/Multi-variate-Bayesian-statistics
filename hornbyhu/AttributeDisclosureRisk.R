@@ -60,8 +60,8 @@ if (useknowngood) {
   meta             <- desc_loader("description.json")[[1]] # [#tuples],[#attributes],[#attributesInBN],[attributeList],[candidateKeyList],[nonCategoricalStringAttributeList],[attributesInBN]]
   bayesian_network <- desc_loader("description.json")[[3]] # [[child], [[parent_1], [parent_2], ... [parent_k]]]
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
-  real_data <-  as.data.frame(data_loader(args[2], 1000))
-  syn_data  <-  as.data.frame(data_loader("synthetic_data.csv", 1000))
+  real_data <-  as.data.frame(data_loader(args[2], 5126))
+  syn_data  <-  as.data.frame(data_loader("synthetic_data.csv", 5126))
   
 }
 
@@ -97,11 +97,6 @@ for (APPair in 2:(length(formulars))) {
 }
 
 syn_data <- list(syn_data)
-syn_data[[1]]["LogIncome"] =      synthesis_list[[1]][[1]][1]
-syn_data[[1]]["LogExpenditure"] = synthesis_list[[2]][[1]][1]
-syn_data[[1]]["KidsCount"] =      synthesis_list[[3]][[1]][1]
-syn_data[[1]]["Race"] =           synthesis_list[[4]][[1]][1]
-syn_data[[1]]["UrbanRural"] =     synthesis_list[[5]][[1]][1]
 
 
 # G: Number of guesses  (the true confidential value plus 10 guesses in the neighborhood within a 20% range of the true confidential value)
