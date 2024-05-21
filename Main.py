@@ -34,7 +34,7 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
 
    if dataset_is_numeric == False:
       print('Converting ' + dataset_name +'.csv ' + 'to numeric as ' + dataset_name + '_num.csv')
-      dataset_name = preprocessor.main(dataset_name, dataset_path, labels_to_encode)
+      dataset_name = preprocessor.main(dataset_name, dataset_path, labels_to_encode, num_tuples_to_generate)
 
    print(dataset_name)
    print('Executing PrivBayes')

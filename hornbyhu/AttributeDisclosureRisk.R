@@ -20,8 +20,7 @@ args = commandArgs(trailingOnly=TRUE)
 # Enables execution both in python and Rstudio
 if (length(args) == length(character(0))){
   args[1] = here()
-  args[2] = "CEData.csv"
-  print(args[1])
+  args[2] = "CEDataR.csv"
 }
 
 path = args[1]
@@ -63,8 +62,7 @@ if (useknowngood) {
   #data_loader(file_name, cut) cut needs to be less or equal to real dataset
   real_data <-  as.data.frame(data_loader(args[2], 1000))
   syn_data  <-  as.data.frame(data_loader("synthetic_data.csv", 1000))
-  print(is.data.frame(real_data))
-  print(is.data.frame(syn_data))
+  
 }
 
 # List of formulars
@@ -99,6 +97,11 @@ for (APPair in 2:(length(formulars))) {
 }
 
 syn_data <- list(syn_data)
+syn_data[[1]]["LogIncome"] =      synthesis_list[[1]][[1]][1]
+syn_data[[1]]["LogExpenditure"] = synthesis_list[[2]][[1]][1]
+syn_data[[1]]["KidsCount"] =      synthesis_list[[3]][[1]][1]
+syn_data[[1]]["Race"] =           synthesis_list[[4]][[1]][1]
+syn_data[[1]]["UrbanRural"] =     synthesis_list[[5]][[1]][1]
 
 # G: Number of guesses  (the true confidential value plus 10 guesses in the neighborhood within a 20% range of the true confidential value)
 # G <- 11
@@ -118,7 +121,7 @@ for (i in seq_along(formulars)) {
     syndata = syn_data,
     posteriorMCMCs = synthesis_list[[i]][2], # Draws
     syntype = "norm",
-    H = 1,
+    H = 50,
     G = 11,
     additiveBounds = NULL, 
     bounds = NULL,

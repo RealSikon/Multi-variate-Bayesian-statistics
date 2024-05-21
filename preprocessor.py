@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-def main(dataset_name, dataset_path, labels_to_encode):
+def main(dataset_name, dataset_path, labels_to_encode, size):
    # Creating a instance of label Encoder.
    le = LabelEncoder()
 
@@ -20,6 +20,8 @@ def main(dataset_name, dataset_path, labels_to_encode):
 
       # Appending the array to our dataFrame 
       df[label] = lab
+
+      df = df[:size]
 
    # printing Dataframe
    num_dataset_path = dataset_path + '_num.csv'

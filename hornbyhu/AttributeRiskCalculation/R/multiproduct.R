@@ -341,10 +341,8 @@ AttributeRiskForRecordI = function(modelFormulas, i, origdata, syndata,
 #' @export
 randomGuessPlot = function(risks, custom_palette = NULL) {
   true_risks = c()
-  true_smth = c()
   for (i in 1:length(risks)) {
     true_risks[i] = risks[[i]]$TrueValProb
-    true_smth = risks[[i]]$FullProb
   }
   plotdf = as.data.frame(true_risks)
   plt = ggplot(data = plotdf) + geom_density(aes(abs(true_risks), color = "density"), size = 1) + 
