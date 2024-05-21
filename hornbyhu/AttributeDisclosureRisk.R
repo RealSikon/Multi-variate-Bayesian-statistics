@@ -103,11 +103,26 @@ syn_data[[1]]["KidsCount"] =      synthesis_list[[3]][[1]][1]
 syn_data[[1]]["Race"] =           synthesis_list[[4]][[1]][1]
 syn_data[[1]]["UrbanRural"] =     synthesis_list[[5]][[1]][1]
 
+
 # G: Number of guesses  (the true confidential value plus 10 guesses in the neighborhood within a 20% range of the true confidential value)
 # G <- 11
 
 # H: The number of posterior parameter draws in the importance sampling step.
 # H <- 50
+index_list <- list()
+for (i in 1:length(nodes)) {
+  index_list[i] <- which(nodes[i] == meta["all_attributes"][[1]])
+}
+
+guess_list = list()
+for (i in 1:length(real_data)){
+  if (length(unique(real_data[[i]])) <= 20){
+    guess_list[i] = length(unique(real_data[[i]]))
+  }
+   else{
+    guess_list[i] = 11
+   }
+}
 
 print("Measuring AttributeDisclosureRisk")
 
@@ -121,8 +136,8 @@ for (i in seq_along(formulars)) {
     syndata = syn_data,
     posteriorMCMCs = synthesis_list[[i]][2], # Draws
     syntype = "norm",
-    H = 50,
-    G = 11,
+    H = 1,
+    G = guess_list[[index_list[[i]]]],
     additiveBounds = NULL, 
     bounds = NULL,
     guesses = NULL,
