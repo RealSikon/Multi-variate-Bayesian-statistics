@@ -25,24 +25,22 @@ posteriorRankPlot <- function(risks){
 #' true value (of LogIncome and LogExpenditure, respectively). The vertical line shows
 #' the prior probability (of 1/11).
 marginalPosteriorProbabilitiesPlot = function(risks) {
-  first = c()
-  second = c()
-  true_marginals = c(first, second)
+  
+  true_risks = c()
   for (i in 1:length(risks)) {
-    true_marginals$first[i] = risks[[i]]$TrueMarginals[1]
-    true_marginals$second[i] = risks[[i]]$TrueMarginals[2]
+    true_marginals[i] = risks[[i]]$TrueMarginals
   }
+  
   
   plotdf = as.data.frame(true_marginals)
   
-  plt = ggplot(data = plotdf) + geom_density(aes(abs(true_marginals$first), color = "LogExpenditure"), size = 1) + 
-    geom_density(aes(abs(true_marginals$second), color = "LogIncome"), size = 1) + 
+  plt = ggplot(data = plotdf) + geom_density(aes(abs(true_marginals)), size = .5) +
     theme(panel.background = element_rect(fill = "white", color = "black"),
           panel.grid.major = element_line(color = "grey")) + 
     labs(x = "Probability of guessing correctly", y = "Density") +
     ggtitle("marginalPosteriorProbabilitiesPlot")
 
-  plt = plt + geom_vline(aes(xintercept = 1/length(risks[[1]]$FullProb[, 1])), col = "red", size = 1)
+  plt = plt + geom_vline(aes(xintercept = 1/length(risks$FullProb[, 1])), col = "red", size = 1)
   
   plt
   return(plt)
@@ -52,18 +50,15 @@ marginalPosteriorProbabilitiesPlot = function(risks) {
 #' guessed value with the largest marginal
 #' posterior probability (for both LogIncome and LogExpenditure).
 absoluteDifferencePlot = function(risks) {
-  first = c()
-  second = c()
-  marginal_diff = c(first, second)
+
+  marginal_diff <- c()
   for (i in 1:length(risks)) {
-    marginal_diff$first[i] = risks[[i]]$MarginalAbsDiff[1]
-    marginal_diff$second[i] = risks[[i]]$MarginalAbsDiff[2]
+    marginal_diff[i] = risks[[i]]$MarginalAbsDiff
   }
   
   plotdf = as.data.frame(marginal_diff)
   
-  plt = ggplot(data = plotdf) + geom_density(aes(abs(marginal_diff$first), color = "LogExpenditure"), size = 1) + 
-    geom_density(aes(abs(marginal_diff$second), color = "LogIncome"), size = 1) + 
+  plt = ggplot(data = plotdf) + geom_density(aes(abs(marginal_diff)), size = .5) + 
     theme(panel.background = element_rect(fill = "white", color = "black"),
           panel.grid.major = element_line(color = "grey")) + 
     labs(x = "Absolute difference", y = "Density") +
@@ -75,11 +70,22 @@ absoluteDifferencePlot = function(risks) {
 
 # Density plot
 density_plot = function(real_att, syn_att) {
-  df <- data.frame(
-    value = c(real_att, syn_att)
-  )
-  print(df[[2]])
-  p <- ggplot(df, aes(x =.data[[2]])) + 
-    geom_density()
-  p
+  
+  both <- c()
+  both$real <- real_att
+  both$syn <- syn_att
+  
+  labels <- c("real", "synthetic")
+  
+  plotdf <- as.data.frame(both)
+  
+  plt <- ggplot(data = plotdf, aes(real_att), group = labels) + 
+    geom_density(aes(abs(both$real), color = "real"), size = .5) +
+    geom_density(aes(abs(both$syn), color = "synthetic"), size = .5) +
+    theme(panel.background = element_rect(fill = "white", color = "black"),
+          panel.grid.major = element_line(color = "grey")) + 
+    labs(x = "Value", y = "Density") +
+    ggtitle("DensityPlot")
+  
+  plt
 }
