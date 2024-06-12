@@ -5,11 +5,11 @@ Structure
    privbayes: Contains PrivBayes synthesizer
    plots: output plots from hornby&hu
 
-Prerequisite
+## Prerequisite
    Installation of R       version 4.3.3 (Not all packages was updated to work on 4.4.0)
    Installation of Python  version 3.7.9
 
-Notable files
+## Notable files
    Main.py
       -Executes datasetconverter.py (if specified), Privbayes and Hornby&Hu in sequence
    datasetconverter.py
@@ -20,22 +20,22 @@ Notable files
       -Output data from PrivBayes
 
 
-How to run:
+## How to run:
 1. Install requirements.txt
 2. Run Main.py
 
 
 
 
-If you got errors read this
-   P: HornbyHu does not accept strings as values, such as M and F or TRUE and False
-   S: Use the preprocessor to convert them to numbers
+## If you got errors read this
+   ### P: HornbyHu does not accept strings as values, such as M and F or TRUE and False
+   ### S: Use the preprocessor to convert them to numbers
    
-   P: Low GLM iterations can cause floating point errors potentially halting the code
-   S: Increase the iterations
+   ### P: Low GLM iterations can cause floating point errors potentially halting the code
+   ### S: Increase the iterations
 
-   P: Attribute names does not support most special characters, attribute names like %cancer will give an error
-   S: Use only letters, numbers and some symbols like '-' and '_' should work
+   ### P: Attribute names does not support most special characters, attribute names like %cancer will give an error
+   ### S: Use only letters, numbers and some symbols like '-' and '_' should work
    
-   P: size errors
-   S: make sure that real data and synthetic data needs to be the same size
+   ### P: size errors
+   ### S: make sure that real data and synthetic data needs to be the same size
