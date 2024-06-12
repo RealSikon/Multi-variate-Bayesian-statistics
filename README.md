@@ -8,6 +8,7 @@ Structure
 ## Prerequisite
    Installation of R       version 4.3.3 (Not all packages was updated to work on 4.4.0)
    Installation of Python  version 3.7.9
+   Installation of Windows (Not tested on Mac or Linux)
 
 ## Notable files
    - Main.py:             Executes datasetconverter.py (if specified), Privbayes and Hornby&Hu in sequence
