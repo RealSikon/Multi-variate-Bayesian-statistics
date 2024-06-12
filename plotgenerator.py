@@ -1,5 +1,5 @@
-from DataSynthesizer.ModelInspector import ModelInspector
-from DataSynthesizer.lib.utils import read_json_file
+from privbayes.DataSynthesizer.ModelInspector import ModelInspector
+from privbayes.DataSynthesizer.lib.utils import read_json_file
 
 from matplotlib import pyplot as plt
 import pandas as pd

@@ -6,15 +6,15 @@ from typing import Dict, List, Union
 from numpy import array_equal
 from pandas import DataFrame, read_csv
 
-from DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
-from DataSynthesizer.datatypes.DateTimeAttribute import is_datetime, DateTimeAttribute
-from DataSynthesizer.datatypes.FloatAttribute import FloatAttribute
-from DataSynthesizer.datatypes.IntegerAttribute import IntegerAttribute
-from DataSynthesizer.datatypes.SocialSecurityNumberAttribute import is_ssn, SocialSecurityNumberAttribute
-from DataSynthesizer.datatypes.StringAttribute import StringAttribute
-from DataSynthesizer.datatypes.utils.DataType import DataType
-from DataSynthesizer.lib import utils
-from DataSynthesizer.lib.PrivBayes import greedy_bayes, construct_noisy_conditional_distributions
+from privbayes.DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
+from privbayes.DataSynthesizer.datatypes.DateTimeAttribute import is_datetime, DateTimeAttribute
+from privbayes.DataSynthesizer.datatypes.FloatAttribute import FloatAttribute
+from privbayes.DataSynthesizer.datatypes.IntegerAttribute import IntegerAttribute
+from privbayes.DataSynthesizer.datatypes.SocialSecurityNumberAttribute import is_ssn, SocialSecurityNumberAttribute
+from privbayes.DataSynthesizer.datatypes.StringAttribute import StringAttribute
+from privbayes.DataSynthesizer.datatypes.utils.DataType import DataType
+from privbayes.DataSynthesizer.lib import utils
+from privbayes.DataSynthesizer.lib.PrivBayes import greedy_bayes, construct_noisy_conditional_distributions
 
 
 class DataDescriber:

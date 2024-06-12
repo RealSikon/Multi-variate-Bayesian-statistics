@@ -3,8 +3,8 @@ from typing import Union
 from numpy import arange
 from pandas import Series
 
-from DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
-from DataSynthesizer.datatypes.utils.DataType import DataType
+from privbayes.DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
+from privbayes.DataSynthesizer.datatypes.utils.DataType import DataType
 
 
 class FloatAttribute(AbstractAttribute):

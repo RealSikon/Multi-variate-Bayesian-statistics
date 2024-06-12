@@ -2,7 +2,7 @@ import os
 import random
 import preprocessor
 import plotgenerator
-import privbayes.notebooks.datasynthesizer as privbayes
+import privbayes.notebooks.DataSynthesizer as privbayes
 
 if __name__ == '__main__': # This line is to stop Privbayes from spawning infinite threads
    ### VARIABLES ###
