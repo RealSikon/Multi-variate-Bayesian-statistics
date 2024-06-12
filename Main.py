@@ -23,8 +23,7 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    labels_to_encode = ['Gender', 'CALC', 'FAVC', 'SCC', 'SMOKE', 'FHWO', 'CAEC', 'MTRANS', 'NObeyesdad']
 
    ## PrivBayes variables ##
-   # An attribute is categorical if its domain size is less than this threshold.
-   threshold_value            = 42
+   threshold_value            = 20   # An attribute is categorical if its domain size is less than this threshold.
    seed                       = 0
    categorical_attributes     = {}
    candidate_keys             = {}
