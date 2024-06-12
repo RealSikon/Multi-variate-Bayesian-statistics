@@ -18,10 +18,9 @@ Structure
 
 ## How to run:
 1. Install requirements.txt
-2. Run Main.py
-
-
-
+2. Run Main.py with run_hornbyhy = True
+   or run_hornbyhy = False and open attributedisclosurerisk in RStudio
+   
 
 ## If you got errors read this
    - P: HornbyHu does not accept strings as values, such as M and F or TRUE and False
