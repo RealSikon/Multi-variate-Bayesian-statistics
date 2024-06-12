@@ -131,7 +131,7 @@ for (i in seq_along(formulars)) {
     syndata = syn_data,
     posteriorMCMCs = synthesis_list[[i]][2], # Draws
     syntype = "norm",
-    H = 1,
+    H = 50,
     G = guess_list[[index_list[[i]]]],
     additiveBounds = NULL, 
     bounds = NULL,
