@@ -8,8 +8,9 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    ### VARIABLES ###
 
    ## Global variables ##
-   dataset_name        = 'DPHP_num.csv' # There is an big where .csv is problematic when dataset_is_numeric is False
-   dataset_is_numeric  = True # Hornbyu required numeric datasets
+   dataset_name        = 'DPHP_num' # Takes .csv, o not write file extension
+   run_preprocessor    = True # Hornbyu required numeric datasets
+   run_privbayes       = False
    run_hornbyhu        = False # Highly recomended to hornbyhu for a single epsilon
    generate_histograms = False # generates histograms and correlation matrices from privbayes
 
@@ -20,7 +21,7 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    dataset_path      = os.path.join(data_directory, dataset_name)
 
    ## preprocessor variables ##
-   labels_to_encode = ['Gender', 'CALC', 'FAVC', 'SCC', 'SMOKE', 'FHWO', 'CAEC', 'MTRANS', 'NObeyesdad']
+   labels_to_encode = []
 
    ## PrivBayes variables ##
    threshold_value            = 20   # An attribute is categorical if its domain size is less than this threshold.
@@ -41,28 +42,30 @@ if __name__ == '__main__': # This line is to stop Privbayes from spawning infini
    ### EXECUTION ###
 
    ## Preprocessor ##
-   if dataset_is_numeric == False:
+   if run_preprocessor == False:
       print('Converting ' + dataset_name +'.csv ' + 'to numeric as ' + dataset_name + '_num.csv')
       dataset_name = preprocessor.main(dataset_name, dataset_path, labels_to_encode, num_tuples_to_generate)
-
+   else:
+      dataset_name += '.csv'
    
    for e in range(len(epsilon)):
       for run in range(1):
          seed = round(random.random()*100000000)
          print("seed:" + str(seed))
 
-         print(dataset_name)
-         print('Executing PrivBayes')
-         privbayes.main(dataset_name, data_directory, threshold_value, categorical_attributes, candidate_keys, epsilon[e], epsilon_string[e], run, degree_of_bayesian_network, num_tuples_to_generate, seed)
+         if run_privbayes == True:
+            print(dataset_name)
+            print('Executing PrivBayes')
+            privbayes.main(dataset_name, data_directory, threshold_value, categorical_attributes, candidate_keys, epsilon[e], epsilon_string[e], run, degree_of_bayesian_network, num_tuples_to_generate, seed)
 
-      if generate_histograms == True:
-         print('Generating histograms between real and synthetic data')
-         plotgenerator.main(dataset_name, data_directory)
+         if generate_histograms == True:
+            print('Generating histograms between real and synthetic data')
+            plotgenerator.main(dataset_name, data_directory)
       
-      if run_hornbyhu == True:
-         print('Executing HornbyHu')
-         #powershell command for executing hornbyhu
-         #rscript_location --vanilla attributedisclosurerisk.r_location, hornbyhu_location, dataset_name
-         hornbyhu_args = [parent_directory + "\hornbyhu", dataset_name]
-         cmd = r"{} --vanilla {} {} {}".format(rscript_location, adr_location, hornbyhu_args[0], hornbyhu_args[1])
-         os.system(cmd)
+         if run_hornbyhu == True:
+            print('Executing HornbyHu')
+            #powershell command for executing hornbyhu
+            #rscript_location --vanilla attributedisclosurerisk.r_location, hornbyhu_location, dataset_name
+            hornbyhu_args = [parent_directory + "\hornbyhu", dataset_name]
+            cmd = r"{} --vanilla {} {} {}".format(rscript_location, adr_location, hornbyhu_args[0], hornbyhu_args[1])
+            os.system(cmd)
