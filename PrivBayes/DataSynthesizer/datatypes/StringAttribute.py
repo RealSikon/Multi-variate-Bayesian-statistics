@@ -5,7 +5,7 @@ from pandas import Series
 
 from privbayes.DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
 from privbayes.DataSynthesizer.datatypes.utils.DataType import DataType
-from privbayes.DataSynthesizer.lib import utils
+from privbayes.DataSynthesizer.bib import utils
 
 
 class StringAttribute(AbstractAttribute):

@@ -5,7 +5,7 @@ import pandas as pd
 from DataSynthesizer.DataDescriber import DataDescriber
 from DataSynthesizer.DataGenerator import DataGenerator
 from DataSynthesizer.ModelInspector import ks_test, kl_test
-from DataSynthesizer.lib.utils import pairwise_attributes_mutual_information
+from DataSynthesizer.bib.utils import pairwise_attributes_mutual_information
 
 
 def test_datasynthesizer():

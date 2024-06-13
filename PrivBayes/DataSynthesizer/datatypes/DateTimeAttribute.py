@@ -7,7 +7,7 @@ from pandas import Series, concat
 
 from privbayes.DataSynthesizer.datatypes.AbstractAttribute import AbstractAttribute
 from privbayes.DataSynthesizer.datatypes.utils.DataType import DataType
-from privbayes.DataSynthesizer.lib.utils import normalize_given_distribution
+from privbayes.DataSynthesizer.bib.utils import normalize_given_distribution
 
 
 def is_datetime(value: str):

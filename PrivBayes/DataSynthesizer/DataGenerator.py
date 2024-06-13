@@ -4,7 +4,7 @@ from numpy import random
 from pandas import DataFrame
 
 from privbayes.DataSynthesizer.datatypes.utils.AttributeLoader import parse_json
-from privbayes.DataSynthesizer.lib.utils import set_random_seed, read_json_file, generate_random_string
+from privbayes.DataSynthesizer.bib.utils import set_random_seed, read_json_file, generate_random_string
 
 
 class DataGenerator(object):

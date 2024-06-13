@@ -7,7 +7,7 @@ from numpy import arange
 from pandas import DataFrame, Series
 from scipy.stats import entropy, ks_2samp
 
-from privbayes.DataSynthesizer.lib.utils import pairwise_attributes_mutual_information, normalize_given_distribution
+from privbayes.DataSynthesizer.bib.utils import pairwise_attributes_mutual_information, normalize_given_distribution
 
 matplotlib.rc('xtick', labelsize=20)
 matplotlib.rc('ytick', labelsize=20)

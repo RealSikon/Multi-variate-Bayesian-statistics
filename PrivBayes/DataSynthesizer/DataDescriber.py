@@ -13,8 +13,8 @@ from privbayes.DataSynthesizer.datatypes.IntegerAttribute import IntegerAttribut
 from privbayes.DataSynthesizer.datatypes.SocialSecurityNumberAttribute import is_ssn, SocialSecurityNumberAttribute
 from privbayes.DataSynthesizer.datatypes.StringAttribute import StringAttribute
 from privbayes.DataSynthesizer.datatypes.utils.DataType import DataType
-from privbayes.DataSynthesizer.lib import utils
-from privbayes.DataSynthesizer.lib.PrivBayes import greedy_bayes, construct_noisy_conditional_distributions
+from privbayes.DataSynthesizer.bib import utils
+from privbayes.DataSynthesizer.bib.PrivBayes import greedy_bayes, construct_noisy_conditional_distributions
 
 
 class DataDescriber:
