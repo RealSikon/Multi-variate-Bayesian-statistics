@@ -8,7 +8,7 @@ from numpy.random import choice
 from pandas import Series
 
 from privbayes.DataSynthesizer.datatypes.utils import DataType
-from privbayes.DataSynthesizer.bib import utils
+from privbayes.DataSynthesizer.lib import utils
 
 
 class AbstractAttribute(object):
