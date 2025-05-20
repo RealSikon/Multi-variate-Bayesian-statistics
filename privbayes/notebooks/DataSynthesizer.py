@@ -1,4 +1,4 @@
-from privbayes.DataSynthesizer.DataDescriber import DataDescriber
+from DataSynthesizer.DataDescriber import DataDescriber
 from privbayes.DataSynthesizer.DataGenerator import DataGenerator
 from privbayes.DataSynthesizer.ModelInspector import ModelInspector
 from privbayes.DataSynthesizer.lib.utils import read_json_file, display_bayesian_network
